@@ -126,11 +126,11 @@ class ElegirRespuestaForm(forms.ModelForm):
         return 
     
 
-class ContenidoForm(forms.ModelForm): 
-    informacion = forms.CharField(widget=forms.Textarea(attrs={'rows': 10}), label='Informacion', required=True) 
-    def __init__(self, *args, **kwargs): 
-        super().__init__(*args, **kwargs) 
+#class ContenidoForm(forms.ModelForm): 
+#    informacion = forms.CharField(widget=forms.Textarea(attrs={'rows': 10}), label='Informacion', required=True) 
+#    def __init__(self, *args, **kwargs): 
+#        super().__init__(*args, **kwargs) 
   
-    class Meta: 
-        model = Contenido 
-        fields = ['archivo','informacion'] 
+#    class Meta: 
+#        model = Contenido 
+#        fields = ['archivo','informacion'] 

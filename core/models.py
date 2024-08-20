@@ -54,14 +54,14 @@ class Evaluacione(models.Model):
         verbose_name_plural = 'Evaluaciones'
         ordering = ['-id']
 
-class Contenido(models.Model):
-    evaluacion = models.ForeignKey(Evaluacione, on_delete=models.CASCADE)  
-    archivo = models.FileField(upload_to='archivos/', verbose_name='Subir Archivo', blank=True, null=True)
-    informacion = models.CharField(max_length=150, null=True, blank=True, verbose_name='Informacion')
+#class Contenido(models.Model):
+#    evaluacion = models.ForeignKey(Evaluacione, on_delete=models.CASCADE)  
+#    archivo = models.FileField(upload_to='archivos/', verbose_name='Subir Archivo', blank=True, null=True)
+#    informacion = models.CharField(max_length=150, null=True, blank=True, verbose_name='Informacion')
 
-    class Meta:
-        verbose_name = 'Contenido'
-        verbose_name_plural = 'Contenidos'
+#    class Meta:
+#        verbose_name = 'Contenido'
+#        verbose_name_plural = 'Contenidos'
 
 # nuevo 2
 
