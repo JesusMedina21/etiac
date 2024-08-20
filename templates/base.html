@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ETIAC Tulio Febres Cordero</title>
+    {% load static %}
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favico.ico' %}" >
+    <link rel="stylesheet" href="{% static 'bootstrap/css/miestilo.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+</head>
+    <body>
+        {% include 'header.html' %}
+        {% block content %}
+        {% endblock %}
+    </body>
+</html>

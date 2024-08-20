@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="">
+
+
+{% if user.is_authenticated %}
+    {% if group_name == 'estudiantes' %}
+    <header class="p-3 text-bg-dark bg-primary">
+    {% elif group_name == 'profesores' %}
+    <header class="p-3 text-bg-dark bg-success">
+    {% elif group_name == 'administrativos' %}
+    <header class="p-3 text-bg-dark bg-secondary">                  
+    {% endif %}
+{% else %}
+    <header class="p-3 text-bg-dark bg-danger">
+{% endif %}    
+<div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        
+        
+        
+
+        {% if group_name == 'administrativos' %}
+            <a class="nav-link px-2 text-white" href="{% url 'home' %}">Inicio</a>  
+            <a class="nav-link px-2 text-white" href="{% url 'usuarios' %}">Usuarios</a> 
+            <a href="{% url 'materia' %}"class="nav-link px-2 text-white">Materias</a>
+        {% endif %}
+        {% if group_name == 'profesores' %}
+        <a class="nav-link px-2 text-white" href="{% url 'home' %}">Inicio</a>  
+        <a href="{% url 'materia' %}"class="nav-link px-2 text-white">Materias</a>
+        {% endif %}
+        {% if group_name == 'estudiantes' %}
+        <a class="nav-link px-2 text-white" href="{% url 'home' %}">Inicio</a>  
+        <a href="{% url 'materia' %}"class="nav-link px-2 text-white">Materias</a>
+        {% endif %}
+
+        <!--Este codigo maneja especificamente el texto, que este todo bonito, a la izquieerda la materia y a la derecha 
+        los nombres-->
+        {% if user.is_authenticated %}
+            {% if group_name == 'estudiantes' %}
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 bg-primary">
+            {% elif group_name == 'profesores' %}
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 bg-success"> 
+            {% elif group_name == 'administrativos' %}
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 bg-secondary">                   
+            {% endif %}
+        {% else %}
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 bg-danger">
+        {% endif %}        
+        
+                 
+        </ul>
+        <div class="text-end">
+            {% if user.is_authenticated %}
+                <li style="list-style-type: none;">
+                    <a>{{ group_name|capfirst }}
+                        | {{ user.first_name }} {{ user.last_name }} 
+                    </a> 
+                </li>
+                <center>
+                    <li style="list-style-type: none;">
+                        <a href="{% url 'logout' %} " class="nav-link px-2 text-white">Cerrar sesion</a>
+                    </li>
+                </center>
+            {% endif %}
+
+            {% if not user.is_authenticated %}
+                <center>
+                <li style="list-style-type: none;">
+                    <a class="nav-link px-2 text-white" href="{% url 'login' %}">Iniciar Sesión</a>
+                </li>
+                </center>
+            {% endif %}   
+        </div>
+    </div>    
+</div>
+</header>
+
+<footer>
+    {% if user.is_authenticated %}
+        {% if group_name == 'estudiantes' %}
+            <header class="p-3 text-bg-dark bg-primary">
+                <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
+      <br> Todos los derechos reservados.</a></center>
+            </header>
+        {% elif group_name == 'profesores' %}
+            <header class="p-3 text-bg-dark bg-success">
+                <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
+      <br> Todos los derechos reservados.</a></center>
+            </header>
+        {% elif group_name == 'administrativos' %}
+            <header class="p-3 text-bg-dark bg-secondary">
+                <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
+      <br> Todos los derechos reservados.</a></center>
+            </header>                   
+        {% endif %}
+    {% else %}
+    <header class="p-3 text-bg-dark bg-danger">
+        <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
+      <br> Todos los derechos reservados.</a></center>
+    </header>
+    {% endif %}                
+</footer>
+
+<style>
+    footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+    .nav-link:hover {
+    background: #2bc77e;
+}
+</style>

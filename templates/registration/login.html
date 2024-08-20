@@ -1,0 +1,44 @@
+
+{% load static %}
+{% block content %}
+<title>ETIAC Tulio Febres Cordero</title>
+<link rel="shortcut icon" type="image/x-icon" href="{% static 'favico.ico' %}" >
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load crispy_forms_tags %}
+
+    <div class="container my-4">
+        {% if user.is_authenticated %}
+            <h2>Ya estás autenticado</h2>
+            {% include 'base.html' %}
+        {% else %}
+            <br>
+            <center>
+                <div class="card-body">
+                   <div class="col-md-4">
+                        <div class="card auto">         
+                            <form method="POST" action="">
+                                {% csrf_token %}
+                                <center>
+                                    <img class="activator img-fluid" src="{% static 'imagenes/logo.jpg' %}"
+                                    width="300" height="300"/>
+                                </center>
+                                <br>
+                                <div class="card-body">
+                                    <center><h5 class="card-title">Bienvenido. Por favor ingrese sus datos</h5></center>  
+                                    {{ form | crispy }}
+                                    <div style="float: right;"> 
+                                        <button class="btn btn-primary" type="submit">Iniciar sesion</button>
+                                        <a class="btn btn-danger" href="{% url 'home' %}">Cancelar</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </center>
+        {% endif %}    
+       
+           
+    </div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.js"></script>
+<div id="tablas" class="container">
+    {% if usuario_examen %}
+        {% for user_examen in usuario_examen %}
+            {% if user_examen.examenes.evaluacion.id == evaluacion_id %}
+                <h1 class="text-center my-3"> 
+                    <center>
+                        <span class="badge badge-info" style="background-color: rgb(56, 101, 224);">
+                            La calificacion de
+                            <br> 
+                            {{user.first_name}}  {{user.last_name}} es: {{ user_examen.puntaje_total }}
+                        </span>  
+                    </center>
+                </h1>
+                <BR>
+                <div  class="table-responsive">
+                    <table id="my-table-1" class="table table-striped table-bodered">
+                        <thead>
+                            <tr>
+                                <th>Alumno</th>
+                                <th>Cedula</th>
+                                <th>Calificación</th>
+                                <th>Materia</th>
+                                <th>Evaluacion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Mostramos el nombre del usuario y su puntaje total solo una vez -->
+                            <tr>
+                                <td>{{ user_examen.usuario.first_name }} {{ user_examen.usuario.last_name }} </td>
+                                <td>{{ user_examen.usuario.profile.cedula }}</td>
+                                <td>{{ user_examen.puntaje_total }}</td>
+                                <td>{{ evaluacion.materia.titulo_materia }}</td>
+                                <td>{{ evaluacion.titulo }}</td>
+                                <td></td> 
+                            </tr>    
+                        </tbody>
+                    </table>      
+            {% endif %}
+        {% endfor %}
+                    <table id="my-table-2" class="table table-striped table-bordered">
+                        {% for user_examen in usuario_examen %}
+                            {% if user_examen.examenes.evaluacion.id == evaluacion_id %}    
+                                <thead>
+                                    <tr>
+                                        <th>Pregunta</th>
+                                        <th>Puntaje</th>
+                                        <th>Respuesta del alumno</th>
+                                        <th>Correcta/Incorrecta</th>
+                                    </tr>
+                                </thead>
+                                <!-- Iteramos sobre las respuestas del usuario -->
+                                {% for respuesta_usuario in respuestas_usuario %}
+                                    {% if respuesta_usuario.Notas == user_examen %}
+                                        <tr>
+                                            <!-- Dejamos vacías las celdas correspondientes al nombre del usuario y su puntaje total -->
+                                            <!-- Mostramos los detalles de cada respuesta -->
+                                            <td>{{ respuesta_usuario.examenes.texto_pregunta }}</td>
+                                            <td>{{ respuesta_usuario.examenes.max_puntaje }}</td>
+                                            <td>{{ respuesta_usuario.respuesta }}</td>   
+                                            <td>         
+                                            <!-- Comparamos la respuesta del usuario con la correcta -->
+                                            {% if respuesta_usuario.correcta %}
+                                                <!-- Si son iguales, la respuesta es correcta -->
+                                                <span class="btn btn-success">Correcta</span>
+                                            {% else %}
+                                                <!-- Si no son iguales, la respuesta es incorrecta -->
+                                                <span class="btn btn-danger">Incorrecta</span>
+                                            {% endif %}
+                                            </td> 
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}    
+                    </table>
+                </div>    
+    {% else %}
+        <center>
+            <br>  
+            <h1>No hay resultados disponibles debido a que usted
+                <br> no realizo la evaluacion
+            </h1> 
+        </center>
+    {% endif %}
+   <br>
+   <script>
+        function generatePDF() {
+            var element = document.getElementById('tablas'); // Selecciona el div que contiene ambas tablas
+            var opt = {
+                margin: 1,
+                filename: 'resultados.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save(); // Guarda ambas tablas en el mismo PDF
+        }
+    </script>   
+</div>
+{% for user_examen in usuario_examen %}
+    <div class="container">
+        <button onclick="generatePDF()" class="btn btn-primary">Guardar calificación</button>
+    </div>
+{% endfor %}
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% load crispy_forms_tags %}
+    <div class="container my-4">
+        <h2>Editar contenido</h2>
+
+        <!-- sección de mensajes -->
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form action="" method="post" enctype="multipart/form-data">
+        <!--Si detallamos este form tiene un enctype, eso significa que maneja archivos
+        los demas forms como materia_crear, materia_editar, evalaucion_crear etc... no manejan eso-->
+            {% csrf_token %}
+            <div class="card mx-auto my-5" style="max-width: 40rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Puede modificar todos estos campos</h5>
+                    {{ form | crispy }}
+                    <div style="float: right;"> 
+                        <button class="btn btn-primary" type="submit">Guardar</button>
+                        <a class="btn btn-danger" href="{% url 'contenidoestudiante' evaluacion_id=object.evaluacion.id %}">Cancelar</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+{% endblock %}

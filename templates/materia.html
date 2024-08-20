@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% if materias %}
+        <div class="container my-4">
+            <center>
+                <h1>Materias del 6to Año de Informatica</h1>
+            </center>
+            {% if group_name == 'administrativos' %}
+                <a class="btn btn-secondary" href="{% url 'materia_crear' %}">Agregar materia</a>
+                <button class="btn btn-danger" id="delete-button">Eliminar materia</button>
+            {% endif %}
+            <!-- sección de mensajes -->
+            {% if messages %}
+                <div class="container mt-3">
+                    {% for message in messages %}
+                    <div class="alert alert-success" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <form action="{% url 'materia_borrar' %}" method="post" id="delete-form">
+                {% csrf_token %}
+                <div class="row my-4">
+                    {% for materia in materias %}
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ materia.materia }}</h5>
+                                <p class="card-text"><strong>Materia: </strong>{{ materia.titulo_materia}}</p>
+                                <p class="card-text"><strong>Profesor: </strong>{{ materia.docente.first_name }} {{ materia.docente.last_name }}</p>
+        
+                                {% if group_name == 'profesores' %}
+                                    <a class="btn btn-sm btn-warning" href="{% url 'evaluacion' materia.id %}">Ir a evaluaciones</a>
+                                {% endif %}
+                                {% if group_name == 'estudiantes' %}
+                                    <a class="btn btn-sm btn-warning" href="{% url 'evaluacion' materia.id %}">Ir a evaluaciones</a>
+                                {% endif %}
+                                {% if group_name == 'administrativos' %}
+                                
+                                <a class="btn btn-sm btn-success" href="{% url 'evaluacion' materia.id %}">Ver evaluaciones</a>
+                                <a class="btn btn-sm btn-warning" href="{% url 'materia_editar' materia.id %}">Editar</a>
+                                
+                                <label class="checkbox-button">
+                                    <input type="checkbox" name="materias_seleccionadas[]" value="{{ materia.id }}" class="checkbox-materia">
+                                    <span>Eliminar</span>
+                                </label>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
+
+    {% else %}
+        {% if group_name == 'administrativos' %}
+            <div class="container my-4">
+                <a class="btn btn-secondary" href="{% url 'materia_crear' %}">Agregar materia</a>
+                <div class="container">
+                    {% if messages %}
+                        <div class="container mt-3">
+                            {% for message in messages %}
+                            <div class="alert alert-success" role="alert">
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="jumbotron my-4">
+                        <center>
+                           <h1>Por favor agregue una materia</h1>
+                        </center>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% if group_name == 'estudiantes' or group_name == 'profesores' %}
+            <div class="container">
+                <div class="jumbotron my-4">
+                    <center>
+                        <h1>Hasta el momento el Administrativo no ha registrado ninguna materia</h1>
+                    </center>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <script>
+        // Obtener referencias a los elementos del checkbox y el botón
+        var checkboxes = document.getElementsByClassName('checkbox-materia');
+        var deleteButton = document.getElementById('delete-button');
+
+        // Agregar un evento de escucha al cambio en el estado de los checkboxes
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].addEventListener('change', function() {
+                // Verificar si al menos un checkbox está seleccionado
+                var alMenosSeleccionado = false;
+                for (var i = 0; i < checkboxes.length; i++) {
+                    if (checkboxes[i].checked) {
+                        alMenosSeleccionado = true;
+                        break;
+                    }
+                }
+
+                // Habilitar o deshabilitar el botón según el estado de los checkboxes
+                if (alMenosSeleccionado) {
+                    deleteButton.disabled = false;
+                } else {
+                    deleteButton.disabled = true;
+                }
+            });
+        }
+
+        // Deshabilitar el botón al cargar la página si ningún checkbox está seleccionado inicialmente
+        var alMenosSeleccionado = false;
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                alMenosSeleccionado = true;
+                break;
+            }
+        }
+        if (!alMenosSeleccionado) {
+            deleteButton.disabled = true;
+        }
+
+        // Agregar evento de escucha al botón de eliminación
+        deleteButton.addEventListener('click', function() {
+            // Mostrar el cuadro de diálogo de confirmación
+            var result = confirm('¿Estás seguro de que deseas eliminar esta materia? Esta acción no se puede deshacer.');
+            // Verificar si el usuario hizo clic en "Aceptar"
+            if (result) {
+                // El usuario hizo clic en "Aceptar", proceder a borrar la materia
+                document.getElementById('delete-form').submit();
+            }
+            // Cambiar el color de fondo del botón a verde
+        });
+    </script>
+
+
+    <style>
+        .checkbox-button {
+      display: inline-block;
+      padding: 4px 8px;
+      background-color: #ff0000;
+      color: white;
+      border-radius: 3px;
+      cursor: pointer;
+      }
+    </style>
+{% endblock %}
+

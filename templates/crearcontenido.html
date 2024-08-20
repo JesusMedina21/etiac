@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container my-3 mb-5">
+        {% load crispy_forms_tags %}
+        <center><h3>Crear Contenido</h3></center>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                
+                <form action="" method="post" enctype="multipart/form-data">
+                    <!--Si no coloco en en form enctype="multipart/form-data" el codigo
+                    no va a correr y me va a mandar fijo un error ese codigo 
+                    enctype="multipart/form-data" es para poder guardar imagenes, archivos etc-->
+                    {% csrf_token %}
+                    <div class="card mx-auto my-5" style="max-width: 40rem;">
+                        <div class="card-body">
+                            <h5 class="card-title">Complete todos los campos</h5>
+                            {{ form | crispy }}
+                            <div style="float: right;"> 
+                                <button class="btn btn-primary" type="submit">Guardar</button>
+                                <a class="btn btn-danger" href="{% url 'contenidoestudiante' evaluacion_id=evaluacion_id %}">Cancelar</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+

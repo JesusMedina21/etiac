@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% load crispy_forms_tags %}
+  
+    <div class="container my-4">
+        <h2>Agregar Nueva Materia</h2>
+
+        <!-- sección de mensajes -->
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="card mx-auto my-5" style="max-width: 40rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Complete todos los campos</h5>
+                    {{ form | crispy }}
+                    <div style="float: right;"> 
+                        <button class="btn btn-primary" type="submit">Guardar</button>
+                        <a class="btn btn-danger" href="{% url 'materia' %}">Cancelar</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+{% endblock %}

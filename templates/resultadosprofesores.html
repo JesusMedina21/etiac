@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.js"></script>
+<div id="tablas" class="container">
+    <h1 class="text-center my-3"> 
+        <span class="badge badge-info" style="background-color: #198754;">
+            Calificacion de los alumnos
+        </span>
+    </h1>
+    <br>
+    <div class="table-responsive">
+        <table id="my-table-1" class="table table-striped table-bodered">
+			<thead>
+				<tr>
+					<th>Alumno</th>
+					<th>Cedula</th>
+					<th>Calificacion</th>
+				 <th>Materia</th>
+				 <th>Evaluacion</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for user_examen in usuario_examen %}
+				<tr>
+					<td>{{ user_examen.usuario.first_name }} {{ user_examen.usuario.last_name }} </td>
+					<td>{{ user_examen.usuario.profile.cedula }}</td>
+                    <th>{{user_examen.puntaje_total}}</th>
+					<td>{{ evaluacion.materia.titulo_materia }}</td>
+				    <td>{{ evaluacion.titulo }}</td>
+					
+			    </tr>
+				{% endfor %}
+			</tbody>
+		</table>
+    </div>
+
+    <script>
+        function generatePDF() {
+            var element = document.getElementById('tablas'); // Selecciona el div que contiene ambas tablas
+            var opt = {
+                margin: 1,
+                filename: 'resultados.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save(); // Guarda ambas tablas en el mismo PDF
+        }
+    </script>
+	
+    
+</div>
+<div class="container">
+    
+
+    <button onclick="generatePDF()" class="btn btn-primary">Guardar calificación</button>
+</div>
+<br><br><br><br>
+{% endblock %}
+

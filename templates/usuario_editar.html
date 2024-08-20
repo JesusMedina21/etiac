@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+    <center>
+        <br><h1>Actualizar datos</h1>
+    </center>
+    <div class="container my-4">   
+        <div class="card"> 
+            <div class="card-body">
+                <form method="POST" action="{% url 'usuario_editar' user_id=user_id %}">
+                    {% csrf_token %}
+                    {% if messages %}
+                        <div class="container mt-3">        
+                            {% for message in messages %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="row">            
+                        <div class="col">
+                            <label for="first_name">Nombre</label>
+                            <input type="text" name="first_name" value="{{ first_name }}" class="form-control" placeholder="Registre su nombre" required>
+                        </div>
+                        <div class="col">
+                            <label for="last_name">Apellido</label>
+                          <input  type="text" name="last_name" value="{{ last_name }}"  class="form-control" placeholder="Registre su apellido" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="cedula_estado">Nacionalidad</label>
+                            <select  name="cedula_estado" class="form-control">
+                                <option value="V" {% if cedula_estado == 'V' %}selected{% endif %}>V</option>
+                                <option value="P" {% if cedula_estado == 'P' %}selected{% endif %}>P</option>
+                                <option value="E" {% if cedula_estado == 'E' %}selected{% endif %}>E</option>
+                            </select>
+                        </div>
+                    </div>    
+                    <div class="col">
+                        <label for="cedula">Cedula</label>
+                        <input type="number" class="form-control" placeholder="Registre su cedula" name="cedula"  value="{{ cedula }}"  required>
+                    </div>  
+                    <div class="form-group col-md-6">
+                        <label for="group">Rol</label>
+                        <select  name="group" class="form-control">
+                            <option>-----</option>
+                            <option value="estudiantes">Estudiantes</option>
+                            <option value="profesores">Profesores</option>
+                            <option value="administrativos">Administrativos</option>
+                        </select>
+                    </div>
+                    <BR>
+                    <br>
+                    <br>
+                    <div style="float: right;">   
+                        <button type="submit" class="btn btn-sm btn-primary">Guardar</button> 
+                        <a class="btn btn-sm btn-danger" href="{% url 'usuarios' %}">Cancelar</a>
+                        <a class="btn btn-sm btn-success" href="{% url 'usuario_actualizar_contrasena_y_usuario' user_id=user_id %}">Cambiar contraseña</a> 
+                    </div>
+                    <br><br>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container my-4">
+        {% if group_name == 'administrativos' %}
+            <a class="btn btn-sm btn-secondary" href="{% url 'usuario_crear' %}">Agregar</a>
+            <button type="submit" class="btn btn-sm btn-danger" id="delete-button">Eliminar</button>
+            <div style="float: right;">
+                <form method="GET" action="{% url 'usuarios' %}">
+                    <input type="text" name="q" value="{{ query }}" type="search" aria-label="Buscar" placeholder="Buscar" size="8">
+                    <button type="submit">Buscar</button>
+                </form>
+            </div>      
+           
+        {% endif %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% if totalusuarios  %}
+        <center><h1>Usuarios</h1></center>
+        <br>
+        <div id="tablas" class="container">
+            <div class="card">  
+                <form action="{% url 'usuarios_borrar' %}" method="post" id="delete-form">
+                    {% csrf_token %}
+                    <div  class="table-responsive">
+                        <table id="my-table-1" class="table table-striped table-bodered">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Cédula</th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>Grupo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for totalusuario in totalusuarios %}
+                                    <tr>
+                                        <td>{{ totalusuario.username }}</td>
+                                        <td>{{ totalusuario.profile.cedula }}</td>
+                                        <td>{{ totalusuario.first_name }}</td>
+                                        <td>{{ totalusuario.last_name }}</td>
+                                        <td>{{ totalusuario.groups.first }}</td>
+                                        <td><a class="btn btn-warning" href="{% url 'usuario_editar' totalusuario.id %}">Editar</a></td>
+                                        <td>
+                                            <label class="checkbox-button">
+                                                <input type="checkbox" name="usuarios_seleccionados[]" value="{{ totalusuario.id }}">
+                                                <span>Eliminar</span>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </form>  
+            </div>
+        </div>
+    
+        <br><br><br>
+    {% else %}
+        <center>
+            <h2 class="text-dark">No se existe la busqueda {{query}} </h2>
+        </center>
+    {% endif %}
+
+    <script>
+        document.getElementById('delete-button').addEventListener('click', function() {
+            // Mostrar el cuadro de diálogo de confirmación
+            var result = confirm('¿Estás seguro de que deseas eliminar estos usuarios? Esta acción no se puede deshacer.');
+            // Verificar si el usuario hizo clic en "Aceptar"
+            if (result) {
+                // El usuario hizo clic en "Aceptar", proceder a borrar los usuarios
+                document.getElementById('delete-form').submit();
+            }
+        });
+    </script>
+    <style>
+        .checkbox-button {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: #ff0000;
+            color: white;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+
+
+
+
+{% endblock %}

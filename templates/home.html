@@ -1,0 +1,240 @@
+{% load static %}
+{% block content %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="shortcut icon" type="image/x-icon" href="{% static 'favico.ico' %}">
+<link rel="stylesheet" href="{% static 'bootstrap/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+<meta charset="UTF-8">
+    <title>ETIAC Tulio Febres Cordero</title>
+    {% if not user.is_authenticated %}
+        <header class="p-3 text-white" style="background-color: #dc3545; position: fixed; top: 0; left: 0; right: 0; width: 100%;">
+            <div class="container">
+                <div class="d-flex justify-content-between">
+                    <div class="ms-auto">
+                        <li style="list-style-type: none;">
+                            <a class="nav-link px-2" href="{% url 'login' %}" style="color: white; text-decoration: none;">Iniciar Sesión</a> 
+                        </li>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main">
+            <br><br><br>      
+            <div class="container">
+                <div class="card__item">
+                    <center>
+                        <h1>
+                            Bienvenido al Sistema educativo de la ETIAC "Tulio Febres Cordero"
+                        </h1>
+                    </center>          
+                </div>
+            </div>                                      
+            <section class="about container">          
+                <div class="about__course">
+                    <BR>
+                    <center>
+                        <h2>¿De que se trata este sistema?</h2>
+                    </center>
+                    <BR>
+                    <div class="container">                 
+                        <div class="card__item">
+                            <br>
+                            <h5>
+                                Es un sistema el cual se encarga de realizar evaluaciones de seleccion multiple y verdadero y falso el cual 
+                                al terminar la evaluacion te entrega los resultados, siendo muy util debido a que ahora tiempo
+                                en la realizacion de los examenes.
+                            </h5>          
+                        </div>                                 
+                    </div>
+                </div>
+                <figure class="about__picture">
+                    <div class="slider-frame">
+                        <br><br>
+                        <ul>
+                            <img class="activator img-fluid active" src="{% static 'imagenes/liceo4.jpg' %}" width="110%" height="50%"/>
+                        </ul>
+                    </div>
+                </figure>  
+            </section>
+            <div class="container">                 
+                <div class="card__item">
+                    <center>
+                        <h1>Reseña Historica de la ETIAC Tulio Febres Cordero</h1><br>
+                        <h5>
+                            La Escuela Técnica Industrial Agropecuaria y Comercial "Tulio Febres Cordero" 
+                            fue fundada en 1958 como el liceo "Tulio Febres Cordero". 
+                            Posteriormente se fusionaron tres institutos para formar la Unidad 
+                            de Educación Media "Tulio Febres Cordero". La institución ofrece tres especialidades: Industrial, 
+                            Agropecuaria y Comercial, y su objetivo es brindar una
+                            formación integral a los estudiantes para prepararlos para la educación superior y la vida.
+                            Está ubicada en el Barrio San Vicente Av. Luis Hurtado Higuera, En San Juan de Colón, 
+                            Municipio Ayacucho del estado Táchira.
+                        </h5>
+                    </center>
+                
+                    
+                </div>                                 
+            </div>
+            <br><br><br><br>
+        </main>
+        <br>  
+        <footer>
+            <header class="p-3" style="background-color: #dc3545; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; color:white">
+                <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
+      <br> Todos los derechos reservados.</a></center>
+            </header>
+        </footer>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        {% if group_name == 'administrativos' %}
+            <header class="p-3 text-white" style="background-color: #6c757d;">     
+                <div class="container">            
+                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">                              
+                    <a class="nav-link px-2 text-white" href="{% url 'home' %}">Inicio</a>  
+                    <a class="nav-link px-2 text-white" href="{% url 'usuarios' %}">Usuarios</a> 
+                    <a href="{% url 'materia' %}"class="nav-link px-2 text-white">Materias</a>
+                    <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 bg-secondary"></ul>                         
+                    <div class="text-end">            
+                        <li style="list-style-type: none;">
+                            <a>{{ group_name|capfirst }}
+                                | {{ user.first_name }} {{ user.last_name }} 
+                            </a> 
+                         </li>
+                        <center>
+                            <li style="list-style-type: none;">
+                                <a href="{% url 'logout' %} " class="nav-link px-2 text-white">Cerrar sesion</a>
+                            </li>
+                        </center>
+                    </div>
+                </div> 
+            </div>      
+            </header>      
+            <br>        
+            <h4 class="display-4 fw-normal text-body-emphasis text-center">Bienvenido/a {{user.first_name}} {{user.last_name}}</h4>       
+            <div class="image-container">
+                <center>
+                    <img class="activator img-fluid custom-size"src="{% static 'imagenes/liceo4.jpg' %}"/>
+                    <br><br>
+                </center> 
+            </div>
+            <footer>
+                <header class="p-3 text-white" style="background-color: #6c757d;">
+                    <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
+      <br> Todos los derechos reservados.</a></center>
+                </header>
+            </footer>    
+        {% endif %}  
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        {% if group_name == 'profesores' %}
+            <header class="p-3 text-white" style="background-color: #198754;">    
+                <div class="container">       
+                    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">                              
+                        <a class="nav-link px-2 text-white" href="{% url 'home' %}">Inicio</a>  
+                        <a href="{% url 'materia' %}"class="nav-link px-2 text-white">Materias</a>
+                        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 bg-secondary"></ul>                         
+                        <div class="text-end">            
+                            <li style="list-style-type: none;">
+                                <a>{{ group_name|capfirst }}
+                                    | {{ user.first_name }} {{ user.last_name }} 
+                                </a> 
+                             </li>
+                            <center>
+                                <li style="list-style-type: none;">
+                                    <a href="{% url 'logout' %} " class="nav-link px-2 text-white">Cerrar sesion</a>
+                                </li>
+                            </center>
+                        </div>
+                    </div> 
+                </div>            
+            </header>      
+            <br>        
+            <h4 class="display-4 fw-normal text-body-emphasis text-center">Bienvenido/a {{user.first_name}} {{user.last_name}}</h4>      
+            <div class="image-container">
+                <center>
+                    <img class="activator img-fluid custom-size"src="{% static 'imagenes/liceo4.jpg' %}"/>
+                    <br><br>
+                </center> 
+            </div>
+            <footer>
+                <header class="p-3 text-white" style="background-color: #198754;">
+                    <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
+      <br> Todos los derechos reservados.</a></center>
+                </header>
+            </footer>    
+        {% endif %}  
+    {% endif %}
+    
+    {% if user.is_authenticated %}
+        {% if group_name == 'estudiantes' %}
+        <header class="p-3 text-white" style="background-color: #0d6efd;">    
+            <div class="container">           
+                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">                              
+                    <a class="nav-link px-2 text-white" href="{% url 'home' %}">Inicio</a>  
+                    <a href="{% url 'materia' %}"class="nav-link px-2 text-white">Materias</a>
+                    <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 bg-secondary"></ul>                         
+                    <div class="text-end">            
+                        <li style="list-style-type: none;">
+                            <a>{{ group_name|capfirst }}
+                                | {{ user.first_name }} {{ user.last_name }} 
+                            </a> 
+                         </li>
+                        <center>
+                            <li style="list-style-type: none;">
+                                <a href="{% url 'logout' %} " class="nav-link px-2 text-white">Cerrar sesion</a>
+                            </li>
+                        </center>
+                    </div>
+                </div>  
+            </div>       
+        </header>      
+        <center>
+            <div class="container1">
+                <br>
+                <h4 class="display-4 fw-normal text-body-emphasis text-center">Bienvenido/a {{user.first_name}} {{user.last_name}}</h4>
+            	<div class="jumbotron my-4">
+                    
+                    <br> 
+            		<h1>Por favor lea las instrucciones antes de realizar las evaluaciones</h1>
+                    <h4>
+                    <br>1. Todas las respuestas son de opcion multiple o Verdadero y Falso.
+                    <br>2. Cada respuesta se muestra una sola vez. Si reinicia la pagina o se sale de la ventana su respuesta perdera el valor.
+                    <br>3. Al terminar el examen se la dara su Nota.
+                    <br><br><br><br>
+                    </h4>
+            	</div>
+            </div>
+            <br><br>
+        </center>             
+        <footer>
+            <header class="p-3 text-white" style="background-color: #0d6efd;">
+                <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
+      <br> Todos los derechos reservados.</a></center>
+            </header>
+        </footer>      
+        {% endif %}  
+    {% endif %}
+    <style>   
+    .p-3 {
+        padding: 1.0rem !important;
+    }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+
+    .custom-size {
+        width: 700px;
+        height: 470px;
+    }
+
+    .nav-link:hover {
+        background: #ff7848;
+    }
+    </style>
+{% endblock %}
+

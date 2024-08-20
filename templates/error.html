@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="image-container">
+        <center>
+            <br>
+            <h2>Usted no tiene permisos para acceder a esta pagina 🤨</h2>
+            <img class="activator img-fluid custom-size" src="{% static 'imagenes/error.jpg' %}" width="70%" height="30%"/>
+        </center>
+    </div>
+    <style>
+        .custom-size {
+        width: 700px;
+        height: 550px;
+        }
+    </style>
+{% endblock %}
+    

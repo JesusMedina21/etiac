@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %} <!-- Si no agrego el load static, aqui  hay error-->
+{% block content %} <!--es decir si lo pongo antes del extender hay peo y antes del block content tambien-->
+    {% load crispy_forms_tags %}
+    <div class="container my-4">
+        <h2>Agregar nuevo examen </h2>
+        <!-- sección de mensajes -->
+        
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="card mx-auto my-5" style="max-width: 40rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Pregunta</h5>
+                    {{ form | crispy }}
+                    <hr>
+                    <center><p>Nota: Debe de escribir al menos 2 opciones y seleccionar 1 correcta</p></center>
+                    <!-- Segundo formulario aquí -->
+                    
+                    {% csrf_token %}
+                        
+                    {{ formset.management_form }}
+                    {% for form_elegir_respuesta in formset %}
+                        {{ form_elegir_respuesta | crispy }} <!-- Si quito el | crispy el diseño se va para la mierda  -->
+                    {% endfor %}  
+                    <div style="float: right;"> 
+                        <button class="btn btn-primary" type="submit">Guardar</button>
+                        <a class="btn btn-danger" href="{% url 'examenes_profesores' evaluacion_id=evaluacion_id %}">Cancelar</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+

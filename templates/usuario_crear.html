@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block content %}
+    <center>
+        <h1>Registro de usuarios</h1>
+    </center>
+    <div class="container my-4">
+        <div class="card"> 
+            <div class="card-body">
+                <form method="POST" action="{% url 'usuario_crear' %}">
+                    {% csrf_token %}
+                    {% if messages %}
+                    <div class="container mt-3">
+                        {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                   
+                    <div class="form-group col-md-6">
+                        <div class="col">
+                            <label for="username">Nombre de usuario</label>
+                            <input type="text" class="form-control" placeholder="Registre su usuario" name="username" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="password">Contraseña (debe contener minimo 8 digitos)</label>
+                            <input type="password" name="password" class="form-control" placeholder="Ingrese su contraseña">
+                        </div>
+                        <div class="col">
+                            <label for="confirm_password">Confirmar Contraseña (debe contener minimo 8 digitos)</label>
+                          <input type="password" name="confirm_password" required class="form-control" placeholder="Confirme su contraseña">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="first_name">Nombre (solo permite letras) </label>
+                            <input type="text" name="first_name" required class="form-control" placeholder="Registre su nombre">
+                        </div>
+                        <div class="col">
+                            <label for="last_name">Apellido (solo permite letras) </label>
+                          <input  type="text" name="last_name" required class="form-control" placeholder="Registre su apellido">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="cedula_estado">Nacionalidad</label>
+                            <select  name="cedula_estado" class="form-control">
+                                <option value="V">V</option>
+                                <option value="P">P</option>
+                                <option value="E">E</option>
+                            </select>
+                        </div>
+                    <div class="col">
+                        <label for="cedula">Cedula (solo permite numeros) </label>
+                        <input type="number" class="form-control" placeholder="Registre su cedula" name="cedula" required>
+                      </div>
+                    </div>  
+                    <div class="form-group col-md-4">
+                        <label for="group">Rol</label>
+                        <select  name="group" id="inputState" class="form-control">
+                            <option value="estudiantes">Estudiantes</option>
+                            <option value="profesores">Profesores</option>
+                            <option value="administrativos">Administrativos</option>
+                        </select>
+                    </div>
+                    <BR>
+                    <div style="float: right;">
+                        <button class="btn btn-primary" type="submit">Guardar</button>
+                        <a class="btn btn-danger" href="{% url 'usuarios' %}">Cancelar</a>
+                    </div>
+                </form> 
+            </div>  
+        </div>
+    </div><br><br><br><br><br><br><br><br>  
+{% endblock %}

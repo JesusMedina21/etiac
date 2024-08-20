@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% if examen %}
+        <div class="container my-4">
+            <center><h2>Examenes de la evaluacion {{ evaluacion.titulo }}</h2></center>
+            {% if group_name == 'profesores' %}
+                <a class="btn btn-secondary" href="{% url 'examenes_crear' evaluacion_id %}">Agregar pregunta</a>
+                <button class="btn btn-danger" id="delete-button">Eliminar pregunta</button>
+            {% endif %}
+            <!-- sección de mensajes -->
+            {% if messages %}
+                <div class="container mt-3">    
+                {% for message in messages %}
+                    <div class="alert alert-success" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+            <form id="delete-form" method="POST" action="{% url 'examenes_borrar' %}">
+                {% csrf_token %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 my-4">
+                    {% for examen in examen %}
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-body">
+                                    <p class="card-text"><strong>Pregunta: </strong>{{ examen.texto_pregunta }}</p>
+                                    <p class="card-text"><strong>Valor: </strong>{{ examen.max_puntaje }}</p>
+                                    {% for opcion in examen.opciones.all %}
+                                        {% if opcion.texto.strip %}
+                                            <p class="card-text"><strong>Opcion: </strong>{{ opcion.texto }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if group_name == 'profesores' %}
+                                        <a class="btn btn-sm btn-warning" href="{% url 'examenes_editar' pk=examen.pk %}">Editar Pregunta</a>
+                                        <label class="checkbox-button">
+                                            <input type="checkbox" name="examenes_seleccionados[]" value="{{ examen.id }}" class="checkbox-examenes">
+                                            <span>Eliminar</span>
+                                        </label>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </form>   
+        </div>
+    {% else %}
+        {% if group_name == 'profesores' %}
+            <div class="container my-4">
+                <a class="btn btn-secondary" href="{% url 'examenes_crear' evaluacion_id %}">Agregar pregunta</a>
+                <div class="container">
+                    {% if messages %}
+                        <div class="container mt-3">
+                            {% for message in messages %}
+                            <div class="alert alert-success" role="alert">
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="jumbotron my-4">
+                        <center>
+                            <h1>Por favor agregue un examen </h1>
+                        </center>
+                    </div>
+                </div>
+            </div>         
+        {% endif %}   
+    {% endif %}     
+    <script>
+        // Obtener referencias a los elementos del checkbox y el botón
+        var checkboxes = document.getElementsByClassName('checkbox-examenes');
+        var deleteButton = document.getElementById('delete-button');
+
+        // Agregar un evento de escucha al cambio en el estado de los checkboxes
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].addEventListener('change', function() {
+                // Verificar si al menos un checkbox está seleccionado
+                var alMenosSeleccionado = false;
+                for (var i = 0; i < checkboxes.length; i++) {
+                    if (checkboxes[i].checked) {
+                        alMenosSeleccionado = true;
+                        break;
+                    }
+                }
+
+                // Habilitar o deshabilitar el botón según el estado de los checkboxes
+                if (alMenosSeleccionado) {
+                    deleteButton.disabled = false;
+                } else {
+                    deleteButton.disabled = true;
+                }
+            });
+        }
+
+        // Deshabilitar el botón al cargar la página si ningún checkbox está seleccionado inicialmente
+        var alMenosSeleccionado = false;
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                alMenosSeleccionado = true;
+                break;
+            }
+        }
+        if (!alMenosSeleccionado) {
+            deleteButton.disabled = true;
+        }
+
+        // Agregar evento de escucha al botón de eliminación
+        deleteButton.addEventListener('click', function() {
+            // Mostrar el cuadro de diálogo de confirmación
+            var result = confirm('¿Estás seguro de que deseas eliminar este examen? Esta acción no se puede deshacer.');
+            // Verificar si el usuario hizo clic en "Aceptar"
+            if (result) {
+                // El usuario hizo clic en "Aceptar", proceder a borrar la materia
+                document.getElementById('delete-form').submit();
+            }
+            // Cambiar el color de fondo del botón a verde
+        });
+    </script>
+
+    <style>
+        .checkbox-button {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: #ff0000;
+            color: white;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}

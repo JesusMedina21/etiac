@@ -1,0 +1,96 @@
+
+{% extends 'base.html' %}
+{% block content %}
+{% if examen is None %}
+<div class="container">
+    <div class="jumbotron my-4">
+        <h1>Ya has respondido todas las preguntas del examen. Por favor, revisa tu calificación</h1>
+        <a class="btn btn-primary" href="{% url 'resultados' evaluacion_id=evaluacion.id  %}">Ver resultados</a>
+    </div>
+</div>
+{% else %}
+<div class="container">
+    <div class="jumbotron my-4">
+        <h3>
+            {{ examen.texto_pregunta }}
+            <br><br> 
+            <center> 
+                <h4> 
+                    Valor de la pregunta: {{ examen.max_puntaje }} 
+                </h4>
+            </center>
+        </h3>
+        <form method="POST" class="form">
+            {% csrf_token %}
+            <input type="hidden" name="examenes_id" value="{{ examen.id }}">
+            {% for opciones in examen.opciones.all %}
+            {% if opciones.texto.strip %} <!-- Con este código solamente muestro los campos llenos, y así no muestro los vacíos -->
+            <br>
+            <div class="form-check mx-4">
+                <input class="form-check-input" type="radio" name="respuesta_id" value="{{ opciones.id }}" id="choice-{{ forloop.counter }}">
+                <label class="form-check-label" for="choice-{{ forloop.counter }}">
+                    {{ opciones.texto }}
+                </label>
+            </div>
+            {% endif %}
+            {% endfor %}
+
+<br>   
+  
+
+  <button type="submit" class="btn btn-success">
+                Enviar
+            </button>
+        </form>
+    </div>
+</div>
+     
+<br> 
+
+<div class="contador">
+    <div>
+        <center><p id="number"></p></center>
+        <h4>Tiempo restante para responder</h4>
+        <BR><BR>
+    </div>
+</div>
+
+
+
+<br>   
+ <br>   
+<br>
+
+<script type="text/javascript"> 
+    var n = 300; // Cambiar el valor de n a 60 para que dure 1 minuto
+    var l = document.getElementById("number");
+    var interval = window.setInterval(function(){
+        var minutes = Math.floor(n / 60);
+        var seconds = n % 60;
+        
+        if (minutes === 0) {
+            l.innerHTML = seconds + " segundos";
+        } else {
+            l.innerHTML = minutes + " minutos " + seconds + " segundos";
+        }
+        
+        n--;
+
+        if (n < 0) {
+            clearInterval(interval);
+            location.reload(); // Reiniciar la página cuando el contador llegue a 0
+        }
+    }, 1000);           
+</script>
+
+<style>
+    .contador {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    
+        font-weight: bold;
+    }
+</style>
+{% endif %}
+{% endblock %}
