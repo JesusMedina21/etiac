@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-import os 
+import os
 from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -55,7 +55,7 @@ JAZZMIN_SETTINGS = {
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "ETIAC",
 
-    
+
 
     # Logo to use for your site, must be present in static files, used for brand on top left
     "site_logo": "imagenes/logo.jpg",
@@ -79,8 +79,8 @@ JAZZMIN_SETTINGS = {
     "copyright": "Copyright © jesusmedina0921@gmail.com",
 
     # List of model admins to search from the search bar, search bar omitted if excluded
-    # If you want to use a single search field you dont need to use a list, you can use a simple string 
-  
+    # If you want to use a single search field you dont need to use a list, you can use a simple string
+
 
     # Field name on user model that contains avatar ImageField/URLField/Charfield or a callable that receives the user
     "user_avatar": None,
@@ -89,13 +89,13 @@ JAZZMIN_SETTINGS = {
     # Top Menu #
     ############
 
-    
+
     #############
     # User Menu #########@eqweqw@@@@@@@@
     #############
 
     # Additional links to include in the user menu on the top right ("app" url type is not allowed)
-   "usermenu_links": [
+    "usermenu_links": [
         {"name": "Ir a inicio", "url": "https://etiac1.pythonanywhere.com", "new_window": True},
 
     ],
@@ -122,8 +122,8 @@ JAZZMIN_SETTINGS = {
     # Custom links to append to app groups, keyed on app name
     "custom_links": {
         "books": [{
-            "name": "Make Messages", 
-            "url": "make_messages", 
+            "name": "Make Messages",
+            "url": "make_messages",
             "icon": "fas fa-comments",
             "permissions": ["books.view_book"]
         }]
@@ -169,11 +169,11 @@ JAZZMIN_SETTINGS = {
     "changeform_format": "horizontal_tabs",
     # override change forms on a per modeladmin basis
     "changeform_format_overrides": {"auth.user": "collapsible", "auth.group": "vertical_tabs"},
-    
+
 }
 
 JAZZMIN_UI_TWEAKS = {
-    
+
     "theme": "pulse",
 }
 
@@ -216,7 +216,7 @@ WSGI_APPLICATION = 'django_roles.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-#Estoy usando MYSQL, lo que es el Name,User Host y PORT me lo da pythonanywhere
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',

@@ -53,7 +53,7 @@
                                         <td><a class="btn btn-warning" href="{% url 'usuario_editar' totalusuario.id %}">Editar</a></td>
                                         <td>
                                             <label class="checkbox-button">
-                                                <input type="checkbox" name="usuarios_seleccionados[]" value="{{ totalusuario.id }}">
+                                                <input type="checkbox" name="usuarios_seleccionados[]" value="{{ totalusuario.id }}" class="checkbox-usuarios">
                                                 <span>Eliminar</span>
                                             </label>
                                         </td>
@@ -75,14 +75,53 @@
     {% endif %}
 
     <script>
-        document.getElementById('delete-button').addEventListener('click', function() {
+        // Obtener referencias a los elementos del checkbox y el botón
+        var checkboxes = document.getElementsByClassName('checkbox-usuarios');
+        var deleteButton = document.getElementById('delete-button');
+
+        // Agregar un evento de escucha al cambio en el estado de los checkboxes
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].addEventListener('change', function() {
+                // Verificar si al menos un checkbox está seleccionado
+                var alMenosSeleccionado = false;
+                for (var i = 0; i < checkboxes.length; i++) {
+                    if (checkboxes[i].checked) {
+                        alMenosSeleccionado = true;
+                        break;
+                    }
+                }
+
+                // Habilitar o deshabilitar el botón según el estado de los checkboxes
+                if (alMenosSeleccionado) {
+                    deleteButton.disabled = false;
+                } else {
+                    deleteButton.disabled = true;
+                }
+            });
+        }
+
+        // Deshabilitar el botón al cargar la página si ningún checkbox está seleccionado inicialmente
+        var alMenosSeleccionado = false;
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                alMenosSeleccionado = true;
+                break;
+            }
+        }
+        if (!alMenosSeleccionado) {
+            deleteButton.disabled = true;
+        }
+
+        // Agregar evento de escucha al botón de eliminación
+        deleteButton.addEventListener('click', function() {
             // Mostrar el cuadro de diálogo de confirmación
-            var result = confirm('¿Estás seguro de que deseas eliminar estos usuarios? Esta acción no se puede deshacer.');
+            var result = confirm('¿Estás seguro de que deseas eliminar esta materia? Esta acción no se puede deshacer.');
             // Verificar si el usuario hizo clic en "Aceptar"
             if (result) {
-                // El usuario hizo clic en "Aceptar", proceder a borrar los usuarios
+                // El usuario hizo clic en "Aceptar", proceder a borrar la materia
                 document.getElementById('delete-form').submit();
             }
+            // Cambiar el color de fondo del botón a verde
         });
     </script>
     <style>

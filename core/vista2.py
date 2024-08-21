@@ -1,30 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>ETIAC Tulio Febres Cordero</title>
-    
-     
-    {% load static %}
-    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favico.ico' %}" >
-    <link rel="stylesheet" href="{% static 'bootstrap/css/miestilo.css' %}">
-    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
-</head>
-    <body>
-        {% include 'header.html' %}
-        {% block content %}
-        {% endblock %}
-    </body>
-</html>
-
-<!--from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView, CreateView, UpdateView
 from .forms import *
 from .models import *
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
-import os 
+import os
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
@@ -33,15 +14,15 @@ from django.template.response import TemplateResponse
 from functools import wraps
 from django.shortcuts import render
 from django.forms import formset_factory, modelformset_factory
-from django.contrib.auth.decorators import login_required, user_passes_test  
-from django.views import View 
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views import View
 from django.db import IntegrityError
 from django.db.models import Q
 import re
 from django.contrib.auth.models import User
 from accounts.models import Profile
 from django.contrib.auth.models import Group
-
+from django.db.models import Sum
 
 
 
@@ -146,16 +127,16 @@ class reglas(TemplateView):
 
 @add_group_name_to_context
 class errorexamenfinalizado(TemplateView):
-    template_name = 'errorexamenfinalizado.html'    
+    template_name = 'errorexamenfinalizado.html'
 
 @add_group_name_to_context
 class errorelaborandoexamen(TemplateView):
-    template_name = 'errorelaborandoexamen.html'    
+    template_name = 'errorelaborandoexamen.html'
 
 
 @add_group_name_to_context
 class error(TemplateView):
-    template_name = 'error.html'   
+    template_name = 'error.html'
 
 @add_group_name_to_context
 class MateriaVista(TemplateView):
@@ -167,10 +148,10 @@ class MateriaVista(TemplateView):
             materias = Materia.objects.filter(docente=self.request.user)
         else:
             materias = Materia.objects.all()
-        
+
         context['materias'] = materias
         return context
-   
+
 @add_group_name_to_context
 class CrearMateria(UserPassesTestMixin, CreateView):
     model = Materia
@@ -181,7 +162,7 @@ class CrearMateria(UserPassesTestMixin, CreateView):
     def test_func(self):
         return self.request.user.groups.filter(name='administrativos').exists()
     ##Solamente puede entrar el administrativo
-    
+
     def handle_no_permission(self):
         return redirect('error')
 
@@ -230,9 +211,9 @@ class BorrarMateria(View):
             materia = Materia.objects.get(id=materia_id)
             materia.delete()
 
-        messages.success(self.request, 'La materia se ha eliminado correctamente')   
+        messages.success(self.request, 'La materia se ha eliminado correctamente')
 
-        return redirect('materia') 
+        return redirect('materia')
 
 
 @add_group_name_to_context
@@ -259,7 +240,7 @@ class EvaluacionVista(UserPassesTestMixin, TemplateView):
         user = self.request.user
         return user == docente or user.groups.filter(name__in=['estudiantes', 'administrativos']).exists()
 
-    
+
     def handle_no_permission(self):
         return redirect('error')
 
@@ -274,11 +255,11 @@ class EvaluacionVista(UserPassesTestMixin, TemplateView):
         else:
             evaluaciones = Evaluacione.objects.all()
         context['evaluaciones'] = evaluaciones
-        context['materia_id'] = materia_id 
+        context['materia_id'] = materia_id
         return context
-    
-   
-    
+
+
+
 @add_group_name_to_context
 class CrearEvaluacion(UserPassesTestMixin, CreateView):
     model = Evaluacione
@@ -299,7 +280,7 @@ class CrearEvaluacion(UserPassesTestMixin, CreateView):
         materia = Materia.objects.get(id=self.kwargs['materia'])
         docente = materia.docente
         return self.request.user == docente
-    
+
     def handle_no_permission(self):
         return redirect('error')
 
@@ -310,7 +291,7 @@ class CrearEvaluacion(UserPassesTestMixin, CreateView):
     def form_invalid(self, form):
         messages.error(self.request, 'Ha ocurrido un error al guardar la evaluacion')
         return self.render_to_response(self.get_context_data(form=form))
-    
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
@@ -322,31 +303,31 @@ class EditarEvaluacion(UserPassesTestMixin, UpdateView):
     form_class = EvaluacionForm
     template_name = 'evaluacion_editar.html'
 
-    
+
 
     def test_func(self):
         evaluacion = self.get_object()
         docente = evaluacion.materia.docente
         return self.request.user == docente
-    
+
     def handle_no_permission(self):
         return redirect('error')
 
     def form_valid(self, form):
         form.save()
         messages.success(self.request, 'Los cambios se han guardado exitosamente')
-        success_url = reverse_lazy('evaluacion', kwargs={'materia_id': self.object.materia.id})        
+        success_url = reverse_lazy('evaluacion', kwargs={'materia_id': self.object.materia.id})
         return redirect(success_url)
 
     def form_invalid(self, form):
         messages.error(self.request, 'Ha ocurrido un error al guardar los cambios')
         return self.render_to_response(self.get_context_data(form=form))
-    
-    def get_form_kwargs(self): ######### <<---------- Sin este codigo no puedo actualizar editar las evaluaciones 
+
+    def get_form_kwargs(self): ######### <<---------- Sin este codigo no puedo actualizar editar las evaluaciones
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
-    
+
 
 @add_group_name_to_context
 class BorrarEvaluacion(View):
@@ -357,13 +338,13 @@ class BorrarEvaluacion(View):
             evaluacion = Evaluacione.objects.get(id=evaluacion_id)
             evaluacion.delete()
 
-         # Obtener el ID de la materia para redireccionar a la URL 
+         # Obtener el ID de la materia para redireccionar a la URL
         materia_id = evaluacion.materia.id
 
         messages.success(self.request, 'La evaluacion se ha borrado exitosamente')
-        
+
         return redirect(reverse('evaluacion', args=[materia_id]))
-        
+
 @add_group_name_to_context
 class ErrorEvaluacion(TemplateView):
     template_name = 'error.html'
@@ -377,110 +358,6 @@ class ErrorEvaluacion(TemplateView):
 ######################################################################################
 
 
-@add_group_name_to_context
-class ContenidoEstudiante(UserPassesTestMixin, TemplateView):
-    template_name = 'contenidoestudiante.html'
-
-    def test_func(self):
-        evaluacion_id = self.kwargs['evaluacion_id']
-        evaluacion = Evaluacione.objects.get(id=evaluacion_id)
-        docente = evaluacion.materia.docente
-        user = self.request.user
-        return user == docente or user.groups.filter(name__in=['estudiantes', 'administrativos']).exists()
-    
-    def handle_no_permission(self):
-        return redirect('error')
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        evaluacion_id = self.kwargs.get('evaluacion_id')
-        evaluacion = Evaluacione.objects.get(id=evaluacion_id)
-        contenidos = Contenido.objects.filter(evaluacion=evaluacion)
-        context['evaluacion'] = evaluacion
-        context['contenidos'] = contenidos
-        context['contenidos_with_extension'] = [(contenido, contenido.archivo.url.split('.')[-1].lower()) if contenido.archivo else (contenido, '') for contenido in context['contenidos']]
-   
-
-        return context
-
-@add_group_name_to_context
-class CrearContenido(UserPassesTestMixin, CreateView): 
-    model = Contenido
-    template_name = 'crearcontenido.html' 
-    form_class = ContenidoForm 
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['evaluacion_id'] = self.kwargs['evaluacion_id']
-        return context
-
-    def test_func(self):
-        evaluacion_id = self.kwargs['evaluacion_id']
-        evaluacion = Evaluacione.objects.get(id=evaluacion_id)
-        docente = evaluacion.materia.docente
-        return self.request.user == docente
-    
-    def handle_no_permission(self): 
-        return redirect('error') 
-    
-    def post(self, request, *args, **kwargs): 
-        form = ContenidoForm(request.POST, request.FILES) 
-        if form.is_valid(): 
-            contenido = form.save(commit=False) 
-            evaluacion_id = self.kwargs['evaluacion_id'] 
-            contenido.evaluacion_id = evaluacion_id 
-            contenido.save() 
-            messages.success(request, 'El contenido se ha guardado correctamente') 
-            return redirect('contenidoestudiante', evaluacion_id=evaluacion_id) 
-        else: 
-            print(form.errors)  # Imprime los errores en la consola para depurar 
-            messages.error(request, 'Error en el formulario') 
-
-
-@add_group_name_to_context
-class EditarContenido(UserPassesTestMixin, UpdateView):
-    model = Contenido
-    form_class = ContenidoForm
-    template_name = 'contenidoeditar.html'
-
-    
-
-    def test_func(self):
-        contenido_id = self.kwargs['pk']
-        contenido = Contenido.objects.get(id=contenido_id)
-        docente = contenido.evaluacion.materia.docente
-        return self.request.user == docente
-      
-    def handle_no_permission(self):
-        return redirect('error')
-    
-    def get_success_url(self):
-        evaluacion_id = self.object.evaluacion.id
-        return reverse_lazy('contenidoestudiante', kwargs={'evaluacion_id': evaluacion_id})
-    
-    def form_valid(self, form):
-        form.instance.archivo = self.request.FILES.get('archivo', None)#Con este codigo
-        #actualizo el campo
-        messages.success(self.request, 'Se ha actualizado el contenido correctamente')
-        return super().form_valid(form)
-    
-    def form_invalid(self, form):
-        messages.error(self.request, 'Ha ocurrido un error al actualizar el contenido')
-        return self.render_to_response(self.get_context_data(form=form))
-    
-class BorrarContenido(View):
-    def post(self, request):
-        contenidos_seleccionados = request.POST.getlist('contenidos_seleccionados[]')
-        
-        # Procesar la eliminación de los contenidos seleccionados
-        for contenido_id in contenidos_seleccionados:
-            contenido = get_object_or_404(Contenido, id=contenido_id)
-            evaluacion_id = contenido.evaluacion_id  # Obtener el ID de la evaluación antes de eliminar el contenido
-            contenido.delete()
-        
-        messages.success(request, 'El contenido se ha eliminado exitosamente')
-        return redirect('contenidoestudiante', evaluacion_id=evaluacion_id)
-       
 ###########################################################################################
 @add_group_name_to_context
 class ExamenProfesores(UserPassesTestMixin, TemplateView): ##Sin el UserPassesTestMixin no puedo dar permisos
@@ -492,10 +369,10 @@ class ExamenProfesores(UserPassesTestMixin, TemplateView): ##Sin el UserPassesTe
         docente = evaluacion.materia.docente
         user = self.request.user
         return user == docente or user.groups.filter(name__in=['estudiantes', 'administrativos']).exists()
-    
+
     def handle_no_permission(self):
         return redirect('error')
-    
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -503,7 +380,7 @@ class ExamenProfesores(UserPassesTestMixin, TemplateView): ##Sin el UserPassesTe
         examen = examenes.objects.filter(evaluacion_id=evaluacion_id).order_by('-id')##<-Con este codigo filtro los examenes de la mismas evaluaciones
         materia_id = None
         if examen:
-            materia_id = examen[0].evaluacion.materia.id 
+            materia_id = examen[0].evaluacion.materia.id
         context['examen'] = examen
         context['evaluacion_id'] = evaluacion_id
         context['materia_id'] = materia_id
@@ -517,11 +394,11 @@ class CrearExamen(UserPassesTestMixin, CreateView):
     form_class = ExamenesForm
     second_form_class = ElegirRespuestaForm
     template_name = 'examenes_crear.html'
-    
+
     def get_success_url(self):
         evaluacion_id = self.object.evaluacion.id
         return reverse('examenes_profesores', kwargs={'evaluacion_id': evaluacion_id})
-    ###CrearExamen tiene un id, por ejemplo CrearExamen/2 pues le estoy diciendo que me mande a la 
+    ###CrearExamen tiene un id, por ejemplo CrearExamen/2 pues le estoy diciendo que me mande a la
     ##vista examenes_profesores/2 el 2 es el id de la evaluacion
 
     def test_func(self):
@@ -529,25 +406,34 @@ class CrearExamen(UserPassesTestMixin, CreateView):
         evaluacion = Evaluacione.objects.get(id=evaluacion_id)
         docente = evaluacion.materia.docente
         return self.request.user == docente
-    
+
     def handle_no_permission(self):
         return redirect('error')
-    
+
     def form_valid(self, form):
         formset = ElegirRespuestaFormset(self.request.POST)
         if form.is_valid() and formset.is_valid():
             # Contador para las respuestas correctas
             campos_llenos = 0
             correctas = 0
-    
+            max_puntaje = form.cleaned_data.get('max_puntaje')
+            if max_puntaje == 0:
+                messages.error(self.request, 'Error: El puntaje no puede ser 0.')
+                return self.render_to_response(self.get_context_data(form=form, formset=formset))
+
+
             for form_elegir_respuesta in formset:
                 if form_elegir_respuesta.is_valid():
                     # Si la respuesta es correcta, incrementamos el contador
                     if form_elegir_respuesta.cleaned_data.get('correcta'):
                         correctas += 1
-                    # Si hay más de una respuesta correcta, lanzamos un error
-                    if correctas > 1:
-                        messages.error(self.request, 'Error: Solo puede haber una respuesta correcta.')
+                        # Si hay más de una respuesta correcta, lanzamos un error
+                        if correctas > 1:
+                            messages.error(self.request, 'Error: Solo puede haber una respuesta correcta.')
+                            return self.render_to_response(self.get_context_data(form=form, formset=formset))
+                    # Si el campo de texto está vacío, pero la respuesta está marcada como correcta, lanzamos un error
+                    if not form_elegir_respuesta.cleaned_data.get('texto') and form_elegir_respuesta.cleaned_data.get('correcta'):
+                        messages.error(self.request, 'Error: El campo de texto no puede estar vacío si la respuesta es correcta.')
                         return self.render_to_response(self.get_context_data(form=form, formset=formset))
                     if form_elegir_respuesta.cleaned_data.get('texto'):
                         campos_llenos += 1
@@ -579,7 +465,7 @@ class CrearExamen(UserPassesTestMixin, CreateView):
             if not form.is_valid():
                 messages.error(self.request, 'Error: No se ha seleccionado una evaluación.')
             return self.render_to_response(self.get_context_data(form=form, formset=formset))
-    
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         evaluacion_id = self.kwargs.get('evaluacion_id')
@@ -588,8 +474,8 @@ class CrearExamen(UserPassesTestMixin, CreateView):
         return kwargs
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)   ##Context_Data se utiliza para agregar datos 
-        
+        context = super().get_context_data(**kwargs)   ##Context_Data se utiliza para agregar datos
+
         evaluacion_id = self.kwargs.get('pk') ##Aqui se obtiene el valor de evaluacion_id
         materia_id = Evaluacione.objects.filter(id=evaluacion_id).values_list('materia', flat=True).first()
         ##la linea de arriba realiza consultas a la base de datos para obtener el id de la materia segun la evaluacion
@@ -609,36 +495,35 @@ class CrearExamen(UserPassesTestMixin, CreateView):
         initial['texto'] = ''
         initial['correcta'] = None
         return initial
-    
 
-from django.forms import modelformset_factory 
-ElegirRespuestaFormSet = modelformset_factory( 
-    model=ElegirRespuesta, 
-    form=ElegirRespuestaForm, 
-    extra=0 
-)  
-@add_group_name_to_context 
-class EditarExamen(UserPassesTestMixin, UpdateView): 
-    model = examenes 
-    form_class = ExamenesForm 
-    second_form_class = ElegirRespuestaForm 
-    template_name = 'examenes_editar.html' 
-    
+from django.forms import modelformset_factory
+ElegirRespuestaFormSet = modelformset_factory(
+    model=ElegirRespuesta,
+    form=ElegirRespuestaForm,
+    extra=0
+)
+@add_group_name_to_context
+class EditarExamen(UserPassesTestMixin, UpdateView):
+    model = examenes
+    form_class = ExamenesForm
+    second_form_class = ElegirRespuestaForm
+    template_name = 'examenes_editar.html'
+
     def test_func(self):
         examen_id = self.kwargs['pk']
         examen = examenes.objects.get(id=examen_id)
         docente = examen.evaluacion.materia.docente
         return self.request.user == docente
-    
-    def handle_no_permission(self): 
-        return redirect('error') 
-    
+
+    def handle_no_permission(self):
+        return redirect('error')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         examen_id = self.kwargs.get('pk')
         examen = examenes.objects.get(id=examen_id)
         evaluacion_id = self.object.evaluacion.id if self.object.evaluacion else None
-        
+
         materia_id = examen.evaluacion.materia.id if examen.evaluacion else None
         if materia_id:
             context['form'] = self.form_class(materia_id=materia_id, instance=self.object)
@@ -648,33 +533,36 @@ class EditarExamen(UserPassesTestMixin, UpdateView):
         context['formset'] = formset
         context['examen_id'] = examen_id
         context['evaluaciones'] = Evaluacione.objects.filter(materia=materia_id)
-        elegirrespuesta_form = ElegirRespuestaForm(instance=None) 
+        elegirrespuesta_form = ElegirRespuestaForm(instance=None)
         context['elegirrespuesta_form'] = elegirrespuesta_form
         return context
-    
-        
+
+
+
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         examenes_form = ExamenesForm(request.POST, instance=self.object)
         elegirrespuesta_formset = ElegirRespuestaFormSet(request.POST, queryset=ElegirRespuesta.objects.filter(examenes=self.object))
 
-        # Validamos el formulario
-        if examenes_form.is_valid() and elegirrespuesta_formset.is_valid():
-
-            # Accedemos al atributo cleaned_data
+        if examenes_form.is_valid():
             evaluacion = examenes_form.cleaned_data['evaluacion']
-            puntaje_total_evaluacion_actual = evaluacion.calcular_puntaje_total_actual()
             examen = examenes_form.save(commit=False)
 
-            
+        # Calcula el puntaje total de todos los exámenes en la evaluación (excluyendo el examen actual)
+            puntaje_total_evaluacion_actual = evaluacion.examenes_set.exclude(id=self.object.id).aggregate(total=Sum('max_puntaje'))['total'] or 0
 
-            if examenes_form.is_valid() and elegirrespuesta_formset.is_valid():   
-                campos_llenos = 0  
-                correctas = 0   
-                if puntaje_total_evaluacion_actual + examen.max_puntaje <= 20:
-                    messages.error(self.request, 'Error: El puntaje total de la evaluación no puede superar los 20 puntos.')
-                    return self.render_to_response(self.get_context_data(examenes_form=examenes_form, elegirrespuesta_form=elegirrespuesta_formset))
-     
+            # Agrega el puntaje del examen actual
+            puntaje_total_evaluacion_actual += examen.max_puntaje
+
+            if puntaje_total_evaluacion_actual > 20:
+                messages.error(self.request, 'Error: El puntaje total de la evaluación no puede superar los 20 puntos.')
+                return self.render_to_response(self.get_context_data(examenes_form=examenes_form, elegirrespuesta_form=elegirrespuesta_formset))
+
+            if examenes_form.is_valid() and elegirrespuesta_formset.is_valid():
+                campos_llenos = 0
+                correctas = 0
+                puntaje_total_evaluacion = evaluacion.calcular_puntaje_total()
                 for form in elegirrespuesta_formset:
                     if form.is_valid():
                         # Si la respuesta es correcta, incrementamos el contador
@@ -685,14 +573,16 @@ class EditarExamen(UserPassesTestMixin, UpdateView):
                             return self.render_to_response(self.get_context_data(examenes_form=examenes_form, elegirrespuesta_form=elegirrespuesta_formset))
                         if form.cleaned_data.get('texto'):
                            campos_llenos += 1
-                    
+
                 if campos_llenos < 2:
                     messages.error(self.request, 'Error: Tiene que llenar minimo dos campos de respuesta.')
-                    return self.render_to_response(self.get_context_data(examenes_form=examenes_form, elegirrespuesta_form=elegirrespuesta_formset))      
-    
+                    return self.render_to_response(self.get_context_data(examenes_form=examenes_form, elegirrespuesta_form=elegirrespuesta_formset))
+
+
+
                 if correctas == 0:
                     messages.error(self.request, 'Error: Debes seleccionar al menos una respuesta correcta.')
-                    return self.render_to_response(self.get_context_data(examenes_form=examenes_form, elegirrespuesta_form=elegirrespuesta_formset))         
+                    return self.render_to_response(self.get_context_data(examenes_form=examenes_form, elegirrespuesta_form=elegirrespuesta_formset))
                 examen = examenes_form.save()
                 elegirrespuesta_formset.save(commit=False)
                 for form in elegirrespuesta_formset:
@@ -715,8 +605,8 @@ class EditarExamen(UserPassesTestMixin, UpdateView):
 
         success_url = reverse('examenes_profesores', kwargs={'evaluacion_id': evaluacion_id})
         return redirect(success_url)
-        
-@add_group_name_to_context    
+
+@add_group_name_to_context
 class BorrarExamen(View):
     def post(self, request):
         examenes_seleccionados = request.POST.getlist('examenes_seleccionados[]')
@@ -726,7 +616,7 @@ class BorrarExamen(View):
             examen.delete()
         # Obtengo el ID de la evaluación para redireccionar a la URL correcta
         evaluacion_id = examen.evaluacion.id
-        messages.success(self.request, 'El examen se ha borrado exitosamente')       
+        messages.success(self.request, 'El examen se ha borrado exitosamente')
         return redirect(reverse('examenes_profesores', args=[evaluacion_id]))
 #############################################################################
 
@@ -744,10 +634,10 @@ def examen(request, evaluacion_id):
         return TemplateResponse(request, 'errorexamenfinalizado.html', context)
     elif evaluacion.status == 'E':
             # Si el estado de la evaluación es "Elaborando examen", mostrar un mensaje de error
-        return TemplateResponse(request, 'errorelaborandoexamen.html', context)     
-        
+        return TemplateResponse(request, 'errorelaborandoexamen.html', context)
+
     if request.method == 'POST':
-   
+
         print(request.POST)  # Agregar esta línea para depurar
         examenes_id = request.POST.get('examenes_id')
         if examenes_id.isdigit():
@@ -772,7 +662,7 @@ def examen(request, evaluacion_id):
         examenes_respondidos = Notas.obtener_examenes_respondidos().values_list('examenes__id', flat=True)
         examenes = evaluacion.examenes_set.exclude(id__in=examenes_respondidos).order_by('?').first()
         if examenes is not None:
-            Notas.crear_intentos([examenes])   
+            Notas.crear_intentos([examenes])
         context = {
             'evaluacion': evaluacion,
             'examen': examenes,
@@ -789,13 +679,13 @@ def respuesta(request, examenes_respondidos_id):
     context = {
         'respondida': respondida
     }
-    if request.user == respondida.Notas.usuario: 
+    if request.user == respondida.Notas.usuario:
         # Mostrar las respuestas del examen al estudiante
         # Tu código para mostrar las respuestas aquí
         return TemplateResponse(request, 'respuesta.html', {'respondida': respondida})
     else:
         # Redirigir a una página de error o mostrar un mensaje de acceso denegado
-     
+
         # El usuario actual no es el docente asignado, redirigir a la vista error
         return redirect('error')
 
@@ -810,7 +700,7 @@ def es_estudiante(user):
 @user_passes_test(es_estudiante, login_url='error')
 def resultados(request, evaluacion_id):
     evaluacion = Evaluacione.objects.get(id=evaluacion_id)
-    
+
     total_usuarios_examen = Nota.objects.filter(usuario=request.user)
     usuario_examen = []
     for nota in total_usuarios_examen:
@@ -820,7 +710,7 @@ def resultados(request, evaluacion_id):
     for user_examen in usuario_examen:
         user_examen.respuestas_correctas = []
         user_examen.puntaje_total = 0  # Inicializar el puntaje total en 0
-        
+
         for respuesta_usuario in respuestas_usuario_evaluacion:
             if respuesta_usuario.Notas == user_examen:
                 # Verificar si la respuesta del usuario es correcta
@@ -837,7 +727,7 @@ def resultados(request, evaluacion_id):
         'perfil_usuario': request.user.profile,
         'evaluacion': evaluacion,
         'materia': evaluacion.materia,
-       
+
     }
     return TemplateResponse(request, 'resultados.html', context)
 
@@ -846,7 +736,7 @@ def resultados(request, evaluacion_id):
 
 @login_required
 @add_group_name_to_contextfunciones
-def resultadosprofesores(request, evaluacion_id): 
+def resultadosprofesores(request, evaluacion_id):
     evaluacion = Evaluacione.objects.get(id=evaluacion_id)
     evaluacione = get_object_or_404(Evaluacione, id=evaluacion_id)
     context = {}
@@ -855,46 +745,46 @@ def resultadosprofesores(request, evaluacion_id):
         return TemplateResponse(request, 'error_realizando_examen.html', context)
     elif evaluacion.status == 'E':
             # Si el estado de la evaluación es "Elaborando examen", mostrar un mensaje de error
-        return TemplateResponse(request, 'errorresultadoelaborando.html', context) 
-    todas_las_notas = Nota.objects.all() 
+        return TemplateResponse(request, 'errorresultadoelaborando.html', context)
+    todas_las_notas = Nota.objects.all()
     materia = evaluacion.materia
-    usuario_examen = [] 
-    for nota in todas_las_notas: 
-        usuario_examen.append(nota) 
-    respuestas_usuario = respuestas.objects.filter(examenes__evaluacion__id=evaluacion_id) 
-    respuestas_usuario_evaluacion = respuestas_usuario.filter(examenes__evaluacion__id=evaluacion_id) 
-    for user_examen in usuario_examen: 
-        user_examen.respuestas_correctas = [] 
-        user_examen.puntaje_total = 0  # Inicializar el puntaje total en 0 
-        for respuesta_usuario in respuestas_usuario_evaluacion: 
-            if respuesta_usuario.Notas == user_examen: 
-                # Verificar si la respuesta del usuario es correcta 
-                if respuesta_usuario.respuesta in respuesta_usuario.examenes.opciones.filter(correcta=True): 
-                    for respuesta_examen in respuesta_usuario.examenes.opciones.filter(correcta=True): 
-                        user_examen.puntaje_total += respuesta_examen.examenes.max_puntaje  # Sumar el puntaje de la respuesta correcta 
-                        user_examen.respuestas_correctas.append(respuesta_examen) 
-                # Agregar la respuesta correcta al objeto de respuesta del usuario 
-                respuesta_usuario.respuesta_correcta = respuesta_usuario.examenes.opciones.filter(correcta=True).first() 
-        user_examen.numero_respuestas_correctas = len(user_examen.respuestas_correctas) 
-    context = { 
-        'usuario_examen': usuario_examen, 
-        'respuestas_usuario': respuestas_usuario, 
-        'evaluacione': evaluacione, 
+    usuario_examen = []
+    for nota in todas_las_notas:
+        usuario_examen.append(nota)
+    respuestas_usuario = respuestas.objects.filter(examenes__evaluacion__id=evaluacion_id)
+    respuestas_usuario_evaluacion = respuestas_usuario.filter(examenes__evaluacion__id=evaluacion_id)
+    for user_examen in usuario_examen:
+        user_examen.respuestas_correctas = []
+        user_examen.puntaje_total = 0  # Inicializar el puntaje total en 0
+        for respuesta_usuario in respuestas_usuario_evaluacion:
+            if respuesta_usuario.Notas == user_examen:
+                # Verificar si la respuesta del usuario es correcta
+                if respuesta_usuario.respuesta in respuesta_usuario.examenes.opciones.filter(correcta=True):
+                    for respuesta_examen in respuesta_usuario.examenes.opciones.filter(correcta=True):
+                        user_examen.puntaje_total += respuesta_examen.examenes.max_puntaje  # Sumar el puntaje de la respuesta correcta
+                        user_examen.respuestas_correctas.append(respuesta_examen)
+                # Agregar la respuesta correcta al objeto de respuesta del usuario
+                respuesta_usuario.respuesta_correcta = respuesta_usuario.examenes.opciones.filter(correcta=True).first()
+        user_examen.numero_respuestas_correctas = len(user_examen.respuestas_correctas)
+    context = {
+        'usuario_examen': usuario_examen,
+        'respuestas_usuario': respuestas_usuario,
+        'evaluacione': evaluacione,
         'evaluacion': evaluacion,
         'materia': evaluacion.materia,
         'perfil_usuario': request.user.profile,
-        
-    } 
 
-    if request.user == materia.docente or request.user.groups.filter(name='administrativos').exists(): 
+    }
+
+    if request.user == materia.docente or request.user.groups.filter(name='administrativos').exists():
         # El usuario actual es el docente asignado, redirigir a la vista resultadosprofesores.html
-        return TemplateResponse(request, 'resultadosprofesores.html', context) 
+        return TemplateResponse(request, 'resultadosprofesores.html', context)
 
     else:
         # El usuario actual no es el docente asignado, redirigir a la vista error
         return redirect('error')
 
-   
+
 
 ######################################################################################################################################################
 
@@ -902,7 +792,7 @@ def resultadosprofesores(request, evaluacion_id):
 
 @login_required
 @add_group_name_to_contextfunciones
-def resultadosdetallados(request, evaluacion_id): 
+def resultadosdetallados(request, evaluacion_id):
     evaluacion = Evaluacione.objects.get(id=evaluacion_id)
     materia = evaluacion.materia
     evaluacion = Evaluacione.objects.get(id=evaluacion_id)
@@ -912,38 +802,38 @@ def resultadosdetallados(request, evaluacion_id):
         return TemplateResponse(request, 'error_realizando_examen.html', context)
     elif evaluacion.status == 'E':
             # Si el estado de la evaluación es "Elaborando examen", mostrar un mensaje de error
-        return TemplateResponse(request, 'errorresultadoelaborando.html', context) 
-    todas_las_notas = Nota.objects.all() 
+        return TemplateResponse(request, 'errorresultadoelaborando.html', context)
+    todas_las_notas = Nota.objects.all()
     materia = evaluacion.materia
-    usuario_examen = [] 
-    for nota in todas_las_notas: 
-        usuario_examen.append(nota) 
-    respuestas_usuario = respuestas.objects.filter(examenes__evaluacion__id=evaluacion_id) 
-    respuestas_usuario_evaluacion = respuestas_usuario.filter(examenes__evaluacion__id=evaluacion_id) 
-    for user_examen in usuario_examen: 
-        user_examen.respuestas_correctas = [] 
-        user_examen.puntaje_total = 0  # Inicializar el puntaje total en 0 
-        for respuesta_usuario in respuestas_usuario_evaluacion: 
-            if respuesta_usuario.Notas == user_examen: 
-                # Verificar si la respuesta del usuario es correcta 
-                if respuesta_usuario.respuesta in respuesta_usuario.examenes.opciones.filter(correcta=True): 
-                    for respuesta_examen in respuesta_usuario.examenes.opciones.filter(correcta=True): 
-                        user_examen.puntaje_total += respuesta_examen.examenes.max_puntaje  # Sumar el puntaje de la respuesta correcta 
-                        user_examen.respuestas_correctas.append(respuesta_examen) 
-                # Agregar la respuesta correcta al objeto de respuesta del usuarioasd 
-                respuesta_usuario.respuesta_correcta = respuesta_usuario.examenes.opciones.filter(correcta=True).first() 
-        user_examen.numero_respuestas_correctas = len(user_examen.respuestas_correctas) 
-    context = { 
-        'usuario_examen': usuario_examen, 
+    usuario_examen = []
+    for nota in todas_las_notas:
+        usuario_examen.append(nota)
+    respuestas_usuario = respuestas.objects.filter(examenes__evaluacion__id=evaluacion_id)
+    respuestas_usuario_evaluacion = respuestas_usuario.filter(examenes__evaluacion__id=evaluacion_id)
+    for user_examen in usuario_examen:
+        user_examen.respuestas_correctas = []
+        user_examen.puntaje_total = 0  # Inicializar el puntaje total en 0
+        for respuesta_usuario in respuestas_usuario_evaluacion:
+            if respuesta_usuario.Notas == user_examen:
+                # Verificar si la respuesta del usuario es correcta
+                if respuesta_usuario.respuesta in respuesta_usuario.examenes.opciones.filter(correcta=True):
+                    for respuesta_examen in respuesta_usuario.examenes.opciones.filter(correcta=True):
+                        user_examen.puntaje_total += respuesta_examen.examenes.max_puntaje  # Sumar el puntaje de la respuesta correcta
+                        user_examen.respuestas_correctas.append(respuesta_examen)
+                # Agregar la respuesta correcta al objeto de respuesta del usuarioasd
+                respuesta_usuario.respuesta_correcta = respuesta_usuario.examenes.opciones.filter(correcta=True).first()
+        user_examen.numero_respuestas_correctas = len(user_examen.respuestas_correctas)
+    context = {
+        'usuario_examen': usuario_examen,
         'respuestas_usuario': respuestas_usuario,
         'evaluacion': evaluacion,
         'materia': materia,
         'perfil_usuario': request.user.profile,
-        
-    } 
-    if request.user == materia.docente or request.user.groups.filter(name='administrativos').exists(): 
+
+    }
+    if request.user == materia.docente or request.user.groups.filter(name='administrativos').exists():
         # El usuario actual es el docente asignado, redirigir a la vista resultadosprofesores.html
-        return TemplateResponse(request, 'resultadosdetallados.html', context) 
+        return TemplateResponse(request, 'resultadosdetallados.html', context)
     else:
         # El usuario actual no es el docente asignado, redirigir a la vista error
         return redirect('error')
@@ -995,7 +885,7 @@ def validar_cedula(request, cedula, cedula_estado, user):
 def es_administrativo(user):
     return user.groups.filter(name='administrativos').exists()
 @login_required
-@user_passes_test(es_administrativo, login_url='error')    
+@user_passes_test(es_administrativo, login_url='error')
 @login_required
 @add_group_name_to_contextfunciones
 def usuario_crear(request):
@@ -1009,64 +899,64 @@ def usuario_crear(request):
         group_name = request.POST['group']
         cedula = request.POST['cedula']
         cedula_estado = request.POST['cedula_estado']
-        
+
         # Validar que las contraseñas coincidan
         if password != confirm_password:
             messages.error(request, 'Las contraseñas no coinciden')
             return redirect('usuario_crear')
-        
+
         # Validar que el nombre y apellido solo contengan letras
         if not re.match("^[a-zA-Z\s]+$", first_name) or not re.match("^[a-zA-Z\s]+$", last_name):
             messages.error(request, 'El nombre y apellido solo pueden contener letras')
             return redirect('usuario_crear')
-        
+
         # Validar la cédula
         if not validar_cedulacrear(request, cedula, cedula_estado):
             return redirect('usuario_crear')
-        
+
         # Validar la contraseña
         if len(password) < 8:
             messages.error(request, 'La contraseña debe tener al menos 8 caracteres')
             return redirect('usuario_crear')
-        
+
         try:
             # Crear el usuario
             user = User.objects.create(username=username, password=password, first_name=first_name, last_name=last_name)
             user.set_password(password)
-            
+
             # Obtener el objeto Group correspondiente al nombre del grupo
             group = Group.objects.get(name=group_name)
-            
+
             # Asignar el grupo al usuario
             user.groups.add(group)
-            
+
             staff_superuser = request.POST.get('staff_superuser', False)
-            
+
             if staff_superuser:
                 user.is_staff = True
                 user.is_superuser = True
-            
+
             # Guardar el usuario
-            
-            
+
+
             # Acceder al perfil relacionado o crear uno nuevo si no existe
             profile, created = Profile.objects.get_or_create(user=user)
-            
+
             # Establecer los valores de cédula y cedula_estado
             profile.cedula = cedula
             profile.cedula_estado = cedula_estado
-            
+
             # Guardar el perfil
             user.save()
             profile.save()
-            
+
             messages.success(request, 'El usuario ha sido creado con éxito')
             return redirect('usuarios')  # Redireccionar a la página de inicio
-        
+
         except IntegrityError:
             messages.error(request, 'Error: el usuario ya existe')
             return redirect('usuario_crear')
-    
+
     else:
         context = {
             'group_name': None,
@@ -1079,18 +969,18 @@ def usuario_crear(request):
             'cedula_estado': None,
         }
         return TemplateResponse(request, 'usuario_crear.html', context)
-    
+
 def es_administrativo(user):
     return user.groups.filter(name='administrativos').exists()
 @login_required
-@user_passes_test(es_administrativo, login_url='error')    
+@user_passes_test(es_administrativo, login_url='error')
 @add_group_name_to_contextfunciones
 def usuarios(request):
 
- 
+
     totalusuarios = User.objects.all()
     query = request.GET.get('q')  # Obtén el valor de búsqueda ingresado por el usuario
-    
+
     if query:
         totalusuarios = totalusuarios.filter(
             Q(username__icontains=query) |  # Busca por nombre de usuario que contenga el valor de búsqueda
@@ -1106,21 +996,21 @@ def usuarios(request):
 def es_administrativo(user):
     return user.groups.filter(name='administrativos').exists()
 @login_required
-@user_passes_test(es_administrativo, login_url='error')    
+@user_passes_test(es_administrativo, login_url='error')
 @add_group_name_to_contextfunciones
 def usuario_editar(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
     if request.method == 'POST':
         # Obtener los datos del formulario
-       
+
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
         group_name = request.POST['group']
         cedula = request.POST['cedula']
         cedula_estado = request.POST['cedula_estado']
 
-       
+
         # Validar que el nombre y apellido solo contengan letras
         if not re.match("^[a-zA-Z\s]+$", first_name) or not re.match("^[a-zA-Z\s]+$", last_name):
             messages.error(request, 'El nombre y apellido solo pueden contener letras')
@@ -1129,7 +1019,7 @@ def usuario_editar(request, user_id):
         # Validar la cédula
         if not validar_cedula(request, cedula, cedula_estado, user):
             return redirect('usuario_editar', user_id=user_id)
-        
+
         if group_name == '-----':
             messages.error(request, 'Por favor, seleccione un grupo')
             return redirect('usuario_editar', user_id=user_id)
@@ -1137,23 +1027,23 @@ def usuario_editar(request, user_id):
             # Actualizar los datos del usuario existente
             user.first_name = first_name
             user.last_name = last_name
-            
+
             # Obtener el objeto Group correspondiente al nombre del grupo
-    
-            group = Group.objects.get(name=group_name) 
+
+            group = Group.objects.get(name=group_name)
             # Asignar el grupo al usuario
             user.groups.clear()  # Eliminar todos los grupos existentes
-            user.groups.add(group)  
-            staff_superuser = request.POST.get('staff_superuser', False) 
+            user.groups.add(group)
+            staff_superuser = request.POST.get('staff_superuser', False)
             if staff_superuser:
                 user.is_staff = True
                 user.is_superuser = True
-                
+
             else:
                 user.is_staff = False
                 user.is_superuser = False
             user.save()
-            
+
             # Actualizar los datos del perfil asociado al usuario
             profile = user.profile
             profile.cedula = cedula
@@ -1182,9 +1072,9 @@ def usuario_editar(request, user_id):
             'cedula_estado': cedula_estado,
             'staff_superuser': user.is_staff and user.is_superuser
         }
-        return TemplateResponse(request, 'usuario_editar.html', context) 
-           
-@add_group_name_to_context    
+        return TemplateResponse(request, 'usuario_editar.html', context)
+
+@add_group_name_to_context
 class BorrarUsuarios(View):
     def post(self, request):
         usuarios_seleccionados = request.POST.getlist('usuarios_seleccionados[]')
@@ -1198,7 +1088,7 @@ class BorrarUsuarios(View):
 def es_administrativo(user):
     return user.groups.filter(name='administrativos').exists()
 @login_required
-@user_passes_test(es_administrativo, login_url='error')    
+@user_passes_test(es_administrativo, login_url='error')
 @add_group_name_to_contextfunciones
 def usuario_actualizar_contrasena_y_usuario(request, user_id):
     user = get_object_or_404(User, id=user_id)
@@ -1227,8 +1117,8 @@ def usuario_actualizar_contrasena_y_usuario(request, user_id):
         context = {
             'user_id': user_id,
             'username': username,
-           
+
         }
-        return TemplateResponse(request, 'usuario_actualizar_contrasena_y_usuario.html', context) 
-    
-    -->
+        return TemplateResponse(request, 'usuario_actualizar_contrasena_y_usuario.html', context)
+
+

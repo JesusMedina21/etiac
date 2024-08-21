@@ -23,7 +23,11 @@ from django.contrib.auth.models import User
 from accounts.models import Profile
 from django.contrib.auth.models import Group
 from django.db.models import Sum
+from django.contrib.auth import login, logout, authenticate
 
+def logout(request):
+    logout(request)
+    return redirect('home')
 
 
 class login(LoginRequiredMixin, TemplateView):
@@ -518,11 +522,6 @@ class CrearExamen(UserPassesTestMixin, CreateView):
             # Contador para las respuestas correctas
             campos_llenos = 0
             correctas = 0
-            max_puntaje = form.cleaned_data.get('max_puntaje')
-            if max_puntaje == 0:
-                messages.error(self.request, 'Error: El puntaje no puede ser 0.')
-                return self.render_to_response(self.get_context_data(form=form, formset=formset))
-        
 
             for form_elegir_respuesta in formset:
                 if form_elegir_respuesta.is_valid():
@@ -598,6 +597,7 @@ class CrearExamen(UserPassesTestMixin, CreateView):
         initial['correcta'] = None
         return initial
     
+
 from django.forms import modelformset_factory 
 ElegirRespuestaFormSet = modelformset_factory( 
     model=ElegirRespuesta, 
@@ -669,6 +669,9 @@ class EditarExamen(UserPassesTestMixin, UpdateView):
                     if form.is_valid():
                         # Si la respuesta es correcta, incrementamos el contador
                         if form.cleaned_data.get('correcta'):
+                            if not form.cleaned_data.get('texto'):
+                                messages.error(self.request, 'Error: Debes escribir el texto de la respuesta correcta.')
+                                return self.render_to_response(self.get_context_data(examenes_form=examenes_form, elegirrespuesta_form=elegirrespuesta_formset))
                             correctas += 1
                         if correctas > 1:
                             messages.error(self.request, 'Error: Solo puede haber una respuesta correcta.')

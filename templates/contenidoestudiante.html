@@ -8,7 +8,7 @@
                 <button class="btn btn-danger" id="delete-button">Eliminar contenido</button>
                 <br>
             {% endif %}
-            <!--sección de mensajes-->
+            <!-- sección de mensajes -->
             {% if messages %}
                 <div class="container mt-3">    
                     {% for message in messages %}
@@ -139,7 +139,7 @@
         // Agregar evento de escucha al botón de eliminación
         deleteButton.addEventListener('click', function() {
             // Mostrar el cuadro de diálogo de confirmación
-            var result = confirm('¿Estás seguro de que deseas eliminar este contenido? Esta acción no se puede deshacer.');
+            var result = confirm('¿Estás seguro de que deseas eliminar esta materia? Esta acción no se puede deshacer.');
             // Verificar si el usuario hizo clic en "Aceptar"
             if (result) {
                 // El usuario hizo clic en "Aceptar", proceder a borrar la materia
@@ -166,3 +166,4 @@
 
     
 {% endblock %}
+

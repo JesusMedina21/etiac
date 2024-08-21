@@ -18,14 +18,17 @@ from django.urls import path, include
 from django.conf import settings
 from core import views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('logout/', views.logout, name='logout'),
     #path('login/', views.login, name='login'),
     path('', include('core.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('examenes/<int:evaluacion_id>/', views.examen, name='examenes'),
+    path('respuestas/<int:examenes_respondidos_id>/',
+         views.respuesta, name='respuestas'),   
     path('resultados/<int:evaluacion_id>/', views.resultados, name='resultados'),
     path('resultadosprofesores/<int:evaluacion_id>/', views.resultadosprofesores, name='resultadosprofesores'),
     path('resultadosdetallados/<int:evaluacion_id>/', views.resultadosdetallados, name='resultadosdetallados'),
@@ -41,6 +44,5 @@ urlpatterns = [
 if settings.DEBUG:
     from django.conf.urls.static import static
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += staticfiles_urlpatterns()

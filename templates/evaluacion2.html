@@ -74,19 +74,13 @@
                                      <!------------------------------------------------FIN DE LOS ESTATUS ---------------------------------------->
     
                                     {% if group_name == 'profesores' %}
-                                        <a class="btn btn-sm btn-primary" href="{% url 'contenidoestudiante' evaluacione.id %}">Contenido</a>
                                         <a class="btn btn-sm btn-warning" href="{% url 'evaluacion_editar' evaluacione.id %}">Editar</a>
                                         <label class="checkbox-button">
                                             <input type="checkbox" name="evaluaciones_seleccionadas[]" value="{{ evaluacione.id }}" class="checkbox-evaluacion">
                                             <span>Borrar</span>
                                         </label>
                                     {% endif %}
-                                    {% if group_name == 'estudiantes' %}
-                                        <a class="btn btn-sm btn-primary" href="{% url 'contenidoestudiante' evaluacione.id %}">Contenido</a>
-                                    {% endif %}
-                                    {% if group_name == 'administrativos' %}
-                                    <a class="btn btn-sm btn-primary" href="{% url 'contenidoestudiante' evaluacione.id %}">Contenido</a>
-                                    {% endif %}
+                                   
                                 </div>
                             </div>
                         </div>
@@ -178,7 +172,7 @@
         // Agregar evento de escucha al botón de eliminación
         deleteButton.addEventListener('click', function() {
             // Mostrar el cuadro de diálogo de confirmación
-            var result = confirm('¿Estás seguro de que deseas eliminar esta materia? Esta acción no se puede deshacer.');
+            var result = confirm('¿Estás seguro de que deseas eliminar esta evaluacion? Esta acción no se puede deshacer.');
             // Verificar si el usuario hizo clic en "Aceptar"
             if (result) {
                 // El usuario hizo clic en "Aceptar", proceder a borrar la materia

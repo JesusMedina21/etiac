@@ -15,8 +15,6 @@
     {% elif group_name == 'administrativos' %}
     <header class="p-3 text-bg-dark bg-secondary">                  
     {% endif %}
-{% else %}
-    <header class="p-3 text-bg-dark bg-danger">
 {% endif %}    
 <div class="container">
     <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
@@ -48,8 +46,6 @@
             {% elif group_name == 'administrativos' %}
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 bg-secondary">                   
             {% endif %}
-        {% else %}
-            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 bg-danger">
         {% endif %}        
         
                  
@@ -68,13 +64,6 @@
                 </center>
             {% endif %}
 
-            {% if not user.is_authenticated %}
-                <center>
-                <li style="list-style-type: none;">
-                    <a class="nav-link px-2 text-white" href="{% url 'login' %}">Iniciar Sesión</a>
-                </li>
-                </center>
-            {% endif %}   
         </div>
     </div>    
 </div>
@@ -84,25 +73,17 @@
     {% if user.is_authenticated %}
         {% if group_name == 'estudiantes' %}
             <header class="p-3 text-bg-dark bg-primary">
-                <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
-      <br> Todos los derechos reservados.</a></center>
+                <center><a>Copyright &copy; 2023 UPTAI Hecho por: Jesus Medina, Carlos Azocar, Anderson Bustos. Todos los derechos reservados.</a></center>
             </header>
         {% elif group_name == 'profesores' %}
             <header class="p-3 text-bg-dark bg-success">
-                <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
-      <br> Todos los derechos reservados.</a></center>
+                <center><a>Copyright &copy; 2023 UPTAI Hecho por: Jesus Medina, Carlos Azocar, Anderson Bustos. Todos los derechos reservados.</a></center>
             </header>
         {% elif group_name == 'administrativos' %}
             <header class="p-3 text-bg-dark bg-secondary">
-                <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
-      <br> Todos los derechos reservados.</a></center>
+                <center><a>Copyright &copy; 2023 UPTAI Hecho por: Jesus Medina, Carlos Azocar, Anderson Bustos. Todos los derechos reservados.</a></center>
             </header>                   
         {% endif %}
-    {% else %}
-    <header class="p-3 text-bg-dark bg-danger">
-        <center><a>Copyright &copy; jesusmedina0921&#64;gmail.com 
-      <br> Todos los derechos reservados.</a></center>
-    </header>
     {% endif %}                
 </footer>
 
@@ -113,6 +94,6 @@
         width: 100%;
     }
     .nav-link:hover {
-    background: #2bc77e;
+    background: #ff7848;
 }
 </style>

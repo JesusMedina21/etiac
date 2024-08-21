@@ -16,10 +16,28 @@ admin.site.site_title = 'ETIAC'
 
 from django.contrib import admin
 
-#admin.site.unregister(User)
+class CustomUserChangeForm(UserChangeForm):
+    class Meta(UserChangeForm.Meta):
+        model = User
 
+class CustomUserAdmin(UserAdmin):
+    form = CustomUserChangeForm
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Informacion Personal', {'fields': ('first_name', 'last_name')}),
+    )
+
+#admin.site.unregister(User)
+#admin.site.register(User, CustomUserAdmin)
+
+
+class CustomGroupAdmin(GroupAdmin):
+    fieldsets = (
+        (None, {'fields': ('name',)}),
+    )
 
 #admin.site.unregister(Group)
+#admin.site.register(Group, CustomGroupAdmin)
 
 
 # NUEVO1

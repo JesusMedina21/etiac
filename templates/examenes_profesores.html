@@ -24,8 +24,10 @@
                         <div class="col">
                             <div class="card">
                                 <div class="card-body">
+                                    <!--Primer formulario-->
                                     <p class="card-text"><strong>Pregunta: </strong>{{ examen.texto_pregunta }}</p>
                                     <p class="card-text"><strong>Valor: </strong>{{ examen.max_puntaje }}</p>
+                                    <!--Segundo formulario-->
                                     {% for opcion in examen.opciones.all %}
                                         {% if opcion.texto.strip %}
                                             <p class="card-text"><strong>Opcion: </strong>{{ opcion.texto }}</p>
@@ -109,7 +111,7 @@
         // Agregar evento de escucha al botón de eliminación
         deleteButton.addEventListener('click', function() {
             // Mostrar el cuadro de diálogo de confirmación
-            var result = confirm('¿Estás seguro de que deseas eliminar este examen? Esta acción no se puede deshacer.');
+            var result = confirm('¿Estás seguro de que deseas eliminar esta materia? Esta acción no se puede deshacer.');
             // Verificar si el usuario hizo clic en "Aceptar"
             if (result) {
                 // El usuario hizo clic en "Aceptar", proceder a borrar la materia
