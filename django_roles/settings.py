@@ -22,9 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-h--g^pi_@klc)-%kr%30ku7btjt7w1bzb2-ei@nrm0!xt3cx(1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'True'
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['etiac1.pythonanywhere.com']
 
 
 # Application definition
@@ -76,7 +76,7 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Bienvenido. Por favor ingrese sus datos",
 
     # Copyright on the footer
-    "copyright": "UPTAI Hecho por: Jesus Medina, Carlos Azocar, Anderson Bustos",
+    "copyright": "Copyright © jesusmedina0921@gmail.com",
 
     # List of model admins to search from the search bar, search bar omitted if excluded
     # If you want to use a single search field you dont need to use a list, you can use a simple string 
@@ -95,9 +95,9 @@ JAZZMIN_SETTINGS = {
     #############
 
     # Additional links to include in the user menu on the top right ("app" url type is not allowed)
-    "usermenu_links": [
-        {"name": "Ir a inicio", "url": "http://127.0.0.1:8000", "new_window": True},
-   
+   "usermenu_links": [
+        {"name": "Ir a inicio", "url": "https://etiac1.pythonanywhere.com", "new_window": True},
+
     ],
 
     #############
@@ -216,11 +216,15 @@ WSGI_APPLICATION = 'django_roles.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-
+#Estoy usando MYSQL, lo que es el Name,User Host y PORT me lo da pythonanywhere
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'etiac1$default',
+        'USER': 'etiac1',
+        'PASSWORD': 'Seether21',
+        'HOST': 'etiac1.mysql.pythonanywhere-services.com',
+        'PORT': '3306',
     }
 }
 

@@ -358,6 +358,108 @@ class ErrorEvaluacion(TemplateView):
 ######################################################################################
 
 
+@add_group_name_to_context
+class ContenidoEstudiante(UserPassesTestMixin, TemplateView):
+    template_name = 'contenidoestudiante.html'
+
+    def test_func(self):
+        evaluacion_id = self.kwargs['evaluacion_id']
+        evaluacion = Evaluacione.objects.get(id=evaluacion_id)
+        docente = evaluacion.materia.docente
+        user = self.request.user
+        return user == docente or user.groups.filter(name__in=['estudiantes', 'administrativos']).exists()
+    
+    def handle_no_permission(self):
+        return redirect('error')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        evaluacion_id = self.kwargs.get('evaluacion_id')
+        evaluacion = Evaluacione.objects.get(id=evaluacion_id)
+        contenidos = Contenido.objects.filter(evaluacion=evaluacion)
+        context['evaluacion'] = evaluacion
+        context['contenidos'] = contenidos
+        context['contenidos_with_extension'] = [(contenido, contenido.archivo.url.split('.')[-1].lower()) if contenido.archivo else (contenido, '') for contenido in context['contenidos']]
+        return context
+
+@add_group_name_to_context
+class CrearContenido(UserPassesTestMixin, CreateView): 
+    model = Contenido
+    template_name = 'crearcontenido.html' 
+    form_class = ContenidoForm 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['evaluacion_id'] = self.kwargs['evaluacion_id']
+        return context
+
+    def test_func(self):
+        evaluacion_id = self.kwargs['evaluacion_id']
+        evaluacion = Evaluacione.objects.get(id=evaluacion_id)
+        docente = evaluacion.materia.docente
+        return self.request.user == docente
+    
+    def handle_no_permission(self): 
+        return redirect('error') 
+    
+    def post(self, request, *args, **kwargs): 
+        form = ContenidoForm(request.POST, request.FILES) 
+        if form.is_valid(): 
+            contenido = form.save(commit=False) 
+            evaluacion_id = self.kwargs['evaluacion_id'] 
+            contenido.evaluacion_id = evaluacion_id 
+            contenido.save() 
+            messages.success(request, 'El contenido se ha guardado correctamente') 
+            return redirect('contenidoestudiante', evaluacion_id=evaluacion_id) 
+        else: 
+            print(form.errors)  # Imprime los errores en la consola para depurar 
+            messages.error(request, 'Error en el formulario') 
+
+
+@add_group_name_to_context
+class EditarContenido(UserPassesTestMixin, UpdateView):
+    model = Contenido
+    form_class = ContenidoForm
+    template_name = 'contenidoeditar.html'
+
+    
+
+    def test_func(self):
+        contenido_id = self.kwargs['pk']
+        contenido = Contenido.objects.get(id=contenido_id)
+        docente = contenido.evaluacion.materia.docente
+        return self.request.user == docente
+      
+    def handle_no_permission(self):
+        return redirect('error')
+    
+    def get_success_url(self):
+        evaluacion_id = self.object.evaluacion.id
+        return reverse_lazy('contenidoestudiante', kwargs={'evaluacion_id': evaluacion_id})
+    
+    def form_valid(self, form):
+        form.instance.archivo = self.request.FILES.get('archivo', None)#Con este codigo
+        #actualizo el campo
+        messages.success(self.request, 'Se ha actualizado el contenido correctamente')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Ha ocurrido un error al actualizar el contenido')
+        return self.render_to_response(self.get_context_data(form=form))
+    
+class BorrarContenido(View):
+    def post(self, request):
+        contenidos_seleccionados = request.POST.getlist('contenidos_seleccionados[]')
+        
+        # Procesar la eliminación de los contenidos seleccionados
+        for contenido_id in contenidos_seleccionados:
+            contenido = get_object_or_404(Contenido, id=contenido_id)
+            evaluacion_id = contenido.evaluacion_id  # Obtener el ID de la evaluación antes de eliminar el contenido
+            contenido.delete()
+        
+        messages.success(request, 'El contenido se ha eliminado exitosamente')
+        return redirect('contenidoestudiante', evaluacion_id=evaluacion_id)
+       
 ###########################################################################################
 @add_group_name_to_context
 class ExamenProfesores(UserPassesTestMixin, TemplateView): ##Sin el UserPassesTestMixin no puedo dar permisos
