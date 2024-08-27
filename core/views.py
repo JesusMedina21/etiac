@@ -404,24 +404,22 @@ class CrearContenido(UserPassesTestMixin, CreateView):
         evaluacion = Evaluacione.objects.get(id=evaluacion_id)
         docente = evaluacion.materia.docente
         return self.request.user == docente
-    
+
     def handle_no_permission(self): 
         return redirect('error') 
-    
-    def post(self, request, *args, **kwargs): 
-        form = ContenidoForm(request.POST, request.FILES) 
-        if form.is_valid(): 
-            contenido = form.save(commit=False) 
-            evaluacion_id = self.kwargs['evaluacion_id'] 
-            contenido.evaluacion_id = evaluacion_id 
-            contenido.save() 
-            messages.success(request, 'El contenido se ha guardado correctamente') 
-            return redirect('contenidoestudiante', evaluacion_id=evaluacion_id) 
-        else: 
-            print(form.errors)  # Imprime los errores en la consola para depurar 
-            messages.error(request, 'Error en el formulario') 
 
+    def form_valid(self, form): 
+        evaluacion_id = self.kwargs['evaluacion_id'] 
+        contenido = form.save(commit=False) 
+        contenido.evaluacion_id = evaluacion_id 
+        contenido.save() 
+        messages.success(self.request, 'El contenido se ha guardado correctamente') 
+        return redirect('contenidoestudiante', evaluacion_id=evaluacion_id)
 
+    def form_invalid(self, form):
+        print(form.errors)  # Imprime los errores en la consola para depurar 
+        return self.render_to_response(self.get_context_data(form=form))
+        
 @add_group_name_to_context
 class EditarContenido(UserPassesTestMixin, UpdateView):
     model = Contenido
