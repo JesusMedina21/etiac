@@ -76,7 +76,7 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Bienvenido. Por favor ingrese sus datos",
 
     # Copyright on the footer
-    "copyright": "jesusmedina0921@gmail.com",
+    "copyright": "UPTAI Hecho por: Jesus Medina, Carlos Azocar, Anderson Bustos",
 
     # List of model admins to search from the search bar, search bar omitted if excluded
     # If you want to use a single search field you dont need to use a list, you can use a simple string 

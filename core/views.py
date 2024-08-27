@@ -25,6 +25,8 @@ from django.contrib.auth.models import Group
 from django.db.models import Sum
 from django.contrib.auth import login, logout, authenticate
 
+from django.core.files.storage import default_storage
+
 def logout(request):
     logout(request)
     return redirect('home')
@@ -425,45 +427,58 @@ class EditarContenido(UserPassesTestMixin, UpdateView):
     model = Contenido
     form_class = ContenidoForm
     template_name = 'contenidoeditar.html'
-
     
-
     def test_func(self):
         contenido_id = self.kwargs['pk']
         contenido = Contenido.objects.get(id=contenido_id)
         docente = contenido.evaluacion.materia.docente
         return self.request.user == docente
-      
+
     def handle_no_permission(self):
         return redirect('error')
-    
+
     def get_success_url(self):
         evaluacion_id = self.object.evaluacion.id
         return reverse_lazy('contenidoestudiante', kwargs={'evaluacion_id': evaluacion_id})
-    
+
     def form_valid(self, form):
-        form.instance.archivo = self.request.FILES.get('archivo', None)#Con este codigo
-        #actualizo el campo
+        # Obtener el contenido actual
+        contenido_actual = self.get_object()
+        
+        # Si hay un archivo antiguo, eliminarlo
+        if contenido_actual.archivo:
+            # Construir la ruta completa al archivo
+            archivo_antiguo_path = contenido_actual.archivo.path
+            if os.path.isfile(archivo_antiguo_path):
+                os.remove(archivo_antiguo_path)
+        
+        # Asignar el nuevo archivo
+        form.instance.archivo = self.request.FILES.get('archivo', None)
+        
+        # Guardar el mensaje de éxito
         messages.success(self.request, 'Se ha actualizado el contenido correctamente')
         return super().form_valid(form)
-    
+
     def form_invalid(self, form):
         messages.error(self.request, 'Ha ocurrido un error al actualizar el contenido')
         return self.render_to_response(self.get_context_data(form=form))
-    
 class BorrarContenido(View):
     def post(self, request):
         contenidos_seleccionados = request.POST.getlist('contenidos_seleccionados[]')
-        
+        evaluacion_id = None  # Inicializar evaluacion_id
         # Procesar la eliminación de los contenidos seleccionados
         for contenido_id in contenidos_seleccionados:
             contenido = get_object_or_404(Contenido, id=contenido_id)
             evaluacion_id = contenido.evaluacion_id  # Obtener el ID de la evaluación antes de eliminar el contenido
-            contenido.delete()
-        
+            
+            # Eliminar el archivo asociado
+            if contenido.archivo:
+                contenido.archivo.delete(save=False)
+                
+            contenido.delete()  # Eliminar el objeto Contenido
+            
         messages.success(request, 'El contenido se ha eliminado exitosamente')
         return redirect('contenidoestudiante', evaluacion_id=evaluacion_id)
-       
 ###########################################################################################
 @add_group_name_to_context
 class ExamenProfesores(UserPassesTestMixin, TemplateView): ##Sin el UserPassesTestMixin no puedo dar permisos
