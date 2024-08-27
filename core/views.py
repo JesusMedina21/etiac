@@ -1016,6 +1016,14 @@ def usuario_crear(request):
             return redirect('usuario_crear')
         
         # Validar la cédula
+        if cedula == '0':  # Verificar si la cédula es 0
+            messages.error(request, 'La cédula no puede ser 0')
+            return redirect('usuario_crear')
+        
+        if cedula.startswith('0'):  # Verificar si la cédula comienza con 0
+            messages.error(request, 'La cédula no puede comenzar con 0')
+            return redirect('usuario_crear')
+        
         if not validar_cedulacrear(request, cedula, cedula_estado):
             return redirect('usuario_crear')
         
@@ -1026,42 +1034,34 @@ def usuario_crear(request):
         
         try:
             # Crear el usuario
-            user = User.objects.create(username=username, password=password, first_name=first_name, last_name=last_name)
+            user = User.objects.create(username=username, first_name=first_name, last_name=last_name)
             user.set_password(password)
             
             # Obtener el objeto Group correspondiente al nombre del grupo
             group = Group.objects.get(name=group_name)
-            
             # Asignar el grupo al usuario
             user.groups.add(group)
             
             staff_superuser = request.POST.get('staff_superuser', False)
-            
             if staff_superuser:
                 user.is_staff = True
                 user.is_superuser = True
             
-            # Guardar el usuario
-            
-            
             # Acceder al perfil relacionado o crear uno nuevo si no existe
             profile, created = Profile.objects.get_or_create(user=user)
-            
             # Establecer los valores de cédula y cedula_estado
             profile.cedula = cedula
             profile.cedula_estado = cedula_estado
             
-            # Guardar el perfil
+            # Guardar el usuario y el perfil
             user.save()
             profile.save()
             
             messages.success(request, 'El usuario ha sido creado con éxito')
             return redirect('usuarios')  # Redireccionar a la página de inicio
-        
         except IntegrityError:
             messages.error(request, 'Error: el usuario ya existe')
             return redirect('usuario_crear')
-    
     else:
         context = {
             'group_name': None,
@@ -1074,7 +1074,6 @@ def usuario_crear(request):
             'cedula_estado': None,
         }
         return TemplateResponse(request, 'usuario_crear.html', context)
-    
 def es_administrativo(user):
     return user.groups.filter(name='administrativos').exists()
 @login_required
