@@ -48,15 +48,6 @@
      
 <br> 
 
-<div class="contador">
-    <div>
-        <center><p id="number"></p></center>
-        <h4>Tiempo restante para responder</h4>
-        <BR><BR>
-    </div>
-</div>
-
-
 
 <br>   
  <br>   
@@ -68,15 +59,12 @@
     var interval = window.setInterval(function(){
         var minutes = Math.floor(n / 60);
         var seconds = n % 60;
-        
         if (minutes === 0) {
-            l.innerHTML = seconds + " segundos";
+            l.innerHTML = "Tiempo restante: " + seconds + " segundos";
         } else {
-            l.innerHTML = minutes + " minutos " + seconds + " segundos";
+            l.innerHTML = "Tiempo restante: " + minutes + " minutos " + seconds + " segundos";
         }
-        
         n--;
-
         if (n < 0) {
             clearInterval(interval);
             location.reload(); // Reiniciar la página cuando el contador llegue a 0
