@@ -17,3 +17,5 @@ python manage.py runserver
 linux
 
 python3 manage.py runserver 
+
+dirigirse a la url 127.0.0.1:8000 en el navegador
