@@ -4,7 +4,9 @@ Sitio Web de elaboracion y realizacion de examenes tipo Quiz/Seleccion Multiple 
 
 sitio: www.etiac1.pythonanywhere.com
 
-comando para instalar las librerias 
+ Para instalar el proyecto necesitas instalar python
+ 
+Y despues necesitas ejecutar los siguientes comandos
 
 pip install -r requirements.txt
 
