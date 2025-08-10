@@ -24,8 +24,16 @@ from accounts.models import Profile
 from django.contrib.auth.models import Group
 from django.db.models import Sum
 from django.contrib.auth import login, logout, authenticate
+##Supabase STORAGE
 
-from django.core.files.storage import default_storage
+import uuid
+from supabase import create_client, Client
+# Inicializa el cliente de Supabase
+
+
+url = settings.SUPABASE_URL
+key = settings.SUPABASE_KEY
+supabase: Client = create_client(url, key)
 
 def logout(request):
     logout(request)
@@ -393,42 +401,65 @@ class CrearContenido(UserPassesTestMixin, CreateView):
     model = Contenido
     template_name = 'crearcontenido.html' 
     form_class = ContenidoForm 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['evaluacion_id'] = self.kwargs['evaluacion_id']
         return context
-
     def test_func(self):
         evaluacion_id = self.kwargs['evaluacion_id']
         evaluacion = Evaluacione.objects.get(id=evaluacion_id)
         docente = evaluacion.materia.docente
         return self.request.user == docente
-
     def handle_no_permission(self): 
         return redirect('error') 
-
     def form_valid(self, form): 
         evaluacion_id = self.kwargs['evaluacion_id'] 
         contenido = form.save(commit=False) 
         contenido.evaluacion_id = evaluacion_id 
+        # Manejo del archivo subido
+        if 'archivo' in self.request.FILES:  # Asegúrate de usar 'archivo'
+            file = self.request.FILES['archivo']
+            file_ext = file.name.split('.')[-1]
+            filename = f"{uuid.uuid4()}.{file_ext}"
+            # Subir el archivo a Supabase
+            supabase.storage.from_('etiac').upload(
+                path=filename,
+                file=file.read(),
+                file_options={"content-type": file.content_type}
+            )
+            # Almacenar la URL pública del archivo en el modelo
+            contenido.archivo = supabase.storage.from_('etiac').get_public_url(filename)
         contenido.save() 
         messages.success(self.request, 'El contenido se ha guardado correctamente') 
         return redirect('contenidoestudiante', evaluacion_id=evaluacion_id)
-
     def form_invalid(self, form):
         print(form.errors)  # Imprime los errores en la consola para depurar 
         return self.render_to_response(self.get_context_data(form=form))
-        
+ 
+def clean_supabase_filename(url):
+    """Extrae el nombre del archivo de una URL de Supabase."""
+    clean_url = url.split('?')[0].split('#')[0]
+    return clean_url.split('etiac/')[-1]
+
+def delete_supabase_file(filename):
+    """Elimina un archivo de Supabase Storage."""
+    try:
+        res = supabase.storage.from_('etiac').remove([filename])
+        # Opcional: Agregar una verificación para asegurar que se eliminó
+        return True
+    except Exception as e:
+        print(f"Error al eliminar el archivo {filename}: {str(e)}")
+        return False
+
 @add_group_name_to_context
 class EditarContenido(UserPassesTestMixin, UpdateView):
     model = Contenido
     form_class = ContenidoForm
     template_name = 'contenidoeditar.html'
-    
+
     def test_func(self):
         contenido_id = self.kwargs['pk']
-        contenido = Contenido.objects.get(id=contenido_id)
+        contenido = get_object_or_404(Contenido, id=contenido_id)
         docente = contenido.evaluacion.materia.docente
         return self.request.user == docente
 
@@ -440,43 +471,101 @@ class EditarContenido(UserPassesTestMixin, UpdateView):
         return reverse_lazy('contenidoestudiante', kwargs={'evaluacion_id': evaluacion_id})
 
     def form_valid(self, form):
-        # Obtener el contenido actual
-        contenido_actual = self.get_object()
-        
-        # Si hay un archivo antiguo, eliminarlo
-        if contenido_actual.archivo:
-            # Construir la ruta completa al archivo
-            archivo_antiguo_path = contenido_actual.archivo.path
-            if os.path.isfile(archivo_antiguo_path):
-                os.remove(archivo_antiguo_path)
-        
-        # Asignar el nuevo archivo
-        form.instance.archivo = self.request.FILES.get('archivo', None)
-        
-        # Guardar el mensaje de éxito
-        messages.success(self.request, 'Se ha actualizado el contenido correctamente')
-        return super().form_valid(form)
+        contenido = form.save(commit=False)
+        evaluacion_id = contenido.evaluacion.id
+
+        # Capturar el archivo antiguo ANTES de que el formulario lo modifique
+        old_file_url = self.get_object().archivo
+        old_file_name = clean_supabase_filename(str(old_file_url)) if old_file_url else None
+
+        # Si se sube un nuevo archivo en el formulario
+        if 'archivo' in self.request.FILES:
+            new_file = self.request.FILES['archivo']
+            file_ext = os.path.splitext(new_file.name)[1]
+            filename = f"{uuid.uuid4()}{file_ext}"
+
+            try:
+                # Subir el nuevo archivo a Supabase
+                supabase.storage.from_('etiac').upload(
+                    path=filename,
+                    file=new_file.read(),
+                    file_options={"content-type": new_file.content_type}
+                )
+                contenido.archivo = supabase.storage.from_('etiac').get_public_url(filename)
+
+                # Eliminar el archivo antiguo solo si existía
+                if old_file_name:
+                    delete_supabase_file(old_file_name)
+
+                messages.success(self.request, 'El contenido se ha actualizado correctamente.')
+                
+            except Exception as e:
+                messages.error(self.request, f"Error al subir el nuevo archivo: {e}")
+                return self.form_invalid(form)
+        else:
+            # Si no se sube un nuevo archivo, mantener el antiguo
+            contenido.archivo = self.get_object().archivo
+            messages.success(self.request, 'El contenido se ha actualizado correctamente.')
+
+        contenido.save()
+        return redirect('contenidoestudiante', evaluacion_id=evaluacion_id)
 
     def form_invalid(self, form):
-        messages.error(self.request, 'Ha ocurrido un error al actualizar el contenido')
+        messages.error(self.request, 'Ha ocurrido un error al actualizar el contenido.')
         return self.render_to_response(self.get_context_data(form=form))
+
 class BorrarContenido(View):
     def post(self, request):
         contenidos_seleccionados = request.POST.getlist('contenidos_seleccionados[]')
-        evaluacion_id = None  # Inicializar evaluacion_id
-        # Procesar la eliminación de los contenidos seleccionados
+        evaluacion_id = None
+
         for contenido_id in contenidos_seleccionados:
             contenido = get_object_or_404(Contenido, id=contenido_id)
-            evaluacion_id = contenido.evaluacion_id  # Obtener el ID de la evaluación antes de eliminar el contenido
-            
-            # Eliminar el archivo asociado
+            evaluacion_id = contenido.evaluacion_id
+
             if contenido.archivo:
-                contenido.archivo.delete(save=False)
-                
-            contenido.delete()  # Eliminar el objeto Contenido
-            
-        messages.success(request, 'El contenido se ha eliminado exitosamente')
+                try:
+                    # Obtener el nombre limpio del archivo
+                    file_url = str(contenido.archivo)
+                    file_name = self.clean_supabase_filename(file_url)
+                    
+                    # Intento de eliminación con verificación
+                    if not self.delete_supabase_file(file_name):
+                        raise Exception("Supabase no confirmó la eliminación")
+                        
+                except Exception as e:
+                    print(f"Fallo al eliminar {file_name}: {str(e)}")
+                    messages.warning(request, f"Error al eliminar archivo: {str(e)}")
+                    continue  # Continuar con el siguiente archivo
+
+            contenido.delete()
+
+        messages.success(request, 'Contenido eliminado exitosamente')
         return redirect('contenidoestudiante', evaluacion_id=evaluacion_id)
+
+    def clean_supabase_filename(self, url):
+        """Limpia la URL para obtener solo el nombre del archivo"""
+        # Elimina parámetros de consulta y fragmentos
+        clean_url = url.split('?')[0].split('#')[0]
+        # Extrae el nombre después de 'etiac/'
+        return clean_url.split('etiac/')[-1]
+
+    def delete_supabase_file(self, filename):
+        """Intenta eliminar el archivo y verifica el resultado"""
+        try:
+            # Intento de eliminación
+            res = supabase.storage.from_('etiac').remove([filename])
+            
+            # Verificación adicional listando los archivos
+            files = supabase.storage.from_('etiac').list()
+            if filename in [f['name'] for f in files]:
+                print(f"Archivo {filename} aún existe después de eliminación")
+                return False
+                
+            return True
+        except Exception as e:
+            print(f"Error en delete_supabase_file: {str(e)}")
+            return False
 ###########################################################################################
 @add_group_name_to_context
 class ExamenProfesores(UserPassesTestMixin, TemplateView): ##Sin el UserPassesTestMixin no puedo dar permisos

@@ -1,23 +1,78 @@
-# ETIAC
+# Guía de instalación del proyecto Django
 
-Sitio Web de elaboracion y realizacion de examenes tipo Quiz/Seleccion Multiple y Verdadero y Falso
+## ¿De que se trata es proyecto?
 
-sitio: www.etiac1.pythonanywhere.com
+ETIAC es un Sitio Web que permite la elaboracion y realizacion de examenes tipo Quiz/Seleccion Multiple y Verdadero y Falso, facilitando la creacion de examenes, la realizacion de los mismos y la evaluacion de los resultados de los estudiantes. Ademas permitiendo al docente agregar contenido a dicho Sitio Web.
 
- Para instalar el proyecto necesitas instalar python
- 
-Y despues necesitas ejecutar los siguientes comandos
+## Instalaciones necesarias
 
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [Python](https://www.python.org/downloads/)
+
+## Antes de comenzar
+
+Antes de comenzar a instalar las dependencias del proyecto es necesario verificar que tienes las dependencias necesarias instaladas.
+Abre la terminal de comandos de tu sistema y sigue los siguientes pasos para asegurarte de que todo está correcto antes de comenzar.
+
+### Verificar instalación de Python
+
+```
+python --v
+```
+
+
+### Comandos para instalar el backend
+
+
+- Ejecuta el siguiente comando para instalar el proyecto:
+
+## Si estas en Windows
+
+```
+py -m venv venv 
+```
+
+```
+.\venv\Scripts\activate
+```
+
+```
 pip install -r requirements.txt
+```
 
-si en linux genera algun error ejecutar el siguiente comando 
+## Si estas en una Distribucion Linux basada en Debian (Ubuntu, Linux Mint etc...)
 
-sudo apt-get install python3-dev default-libmysqlclient-dev pkg-config
+```
+python3 -m venv venv
+```
 
-comando para correr el proyecto 
+```
+source venv/bin/activate
+```
+
+```
+pip3 install -r requirements.txt
+```
+
+## Levantar proyecto
+
+Para ejecutar el servidor de desarrollo del proyecto debes ejecutar el siguiente comando:
+
+## Si estas en Windows
+
+```
 
 python manage.py runserver
+```
+
+## Si estas en Linux
+
+```
+
+python3 manage.py runserver
+```
+
+Te diriges a la url localhost:8000 en el navegador
 
 
-
-dirigirse a la url 127.0.0.1:8000 en el navegador
+<h3 align="center">¡Y Listo! Has terminado de correr el proyecto 🥳</h3>

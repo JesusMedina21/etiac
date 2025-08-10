@@ -29,21 +29,9 @@
                             <div class="card">
                                 <div class="card-body">                      
                                     {% if contenido.archivo %}
-                                        {% if extension == 'jpg' or extension == 'jpeg' or extension == 'png' %}
-                                            <center>
-                                                <img class="activator img-fluid" src="{{ contenido.archivo.url }}" alt="Imagen"  width="100%">
-                                            </center>
-                                        {% elif extension == 'pdf' %}
-                                            <center>
-                                                <object data="{{ contenido.archivo.url }}" type="application/pdf" width="100%" height="500px">
-                                                    <a class="btn btn-primary"  href="{{ contenido.archivo.url }}">Descargar PDF</a>
-                                                </object>
-                                            </center>
-                                        {% elif extension == 'mp4' %}
-                                            <center><a class="btn btn-primary" href="{{ contenido.archivo.url }}">Ver Video</a></center>    
-                                        {% else %}
-                                            <center><a class="btn btn-primary"href="{{ contenido.archivo.url }}">Descargar archivo</a></center>
-                                        {% endif %}
+                         
+                                            <center><a class="btn btn-primary"href="{{ contenido.archivo }}">Visualizar archivo</a></center>
+                             
                                    {% endif %}
                                    <center><p>Informacion: {{ contenido.informacion|urlize  }}</p></center>
                                    {% if group_name == 'profesores' %}

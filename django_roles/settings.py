@@ -215,17 +215,24 @@ WSGI_APPLICATION = 'django_roles.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-
-
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres.zcosymcjpjlqbuvqdvxr',
+        'PASSWORD':  'RsXBahnMvCpTdjui',
+        'HOST': 'aws-0-us-east-2.pooler.supabase.com',
+        'PORT': '5432',
+        "OPTIONS":  {
+            "sslmode": 'verify-full',
+            "sslrootcert": os.path.join(BASE_DIR, 'prod-ca-2021.crt')
+        }
+
     }
 }
 
+SUPABASE_URL = 'https://zcosymcjpjlqbuvqdvxr.supabase.co'
+SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpjb3N5bWNqcGpscWJ1dnFkdnhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwODM5NzgsImV4cCI6MjA1OTY1OTk3OH0.MvzMSH2K5BbchPuhsaG73aHY4UskDxYU1Cgm_bvXZaU'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
